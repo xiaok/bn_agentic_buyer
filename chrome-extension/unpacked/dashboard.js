@@ -2115,9 +2115,11 @@ function drawPairingQr(canvas, url) {
 
 // src/order-ui.mjs
 var isFinished = (op) => ["SUCCESS", "FAILED", "BLOCKED"].includes(op.status);
-var orderHash = (op) => op.result?.txHash || [...op.steps].reverse().find((step) => step.txHash)?.txHash;
+var orderHash = (op) => op.result?.txHash || op.steps.find((step) => step.name === "trade" && step.txHash)?.txHash || [...op.steps].reverse().find((step) => step.txHash)?.txHash;
+var awaitingSettlement = (op) => op.status === "PENDING" && op.intent.side === "sell" && op.steps?.some((step) => step.name === "trade" && step.status === "CONFIRMED");
 function orderLabel(op) {
   if (op.manualRelease) return "\u5DF2\u624B\u52A8\u89E3\u9501 \xB7 \u7ED3\u679C\u672A\u6838\u5B9E";
+  if (awaitingSettlement(op)) return "\u5356\u51FA\u5DF2\u786E\u8BA4\uFF0F\u5F85\u7ED3\u7B97";
   const side = op.intent.side === "buy" ? "\u4E70\u5165" : "\u5356\u51FA";
   return {
     SUCCESS: `${side}\u6210\u529F`,
@@ -2132,6 +2134,7 @@ function orderLabel(op) {
 function orderDetail(op) {
   if (op.manualRelease) return "\u672C\u5730\u9501\u5DF2\u89E3\u9664\uFF0C\u65E7\u8BA2\u5355\u4E0D\u4F1A\u7EE7\u7EED\u6267\u884C\u3002\u5DF2\u63D0\u4EA4\u4EA4\u6613\u4ECD\u53EF\u80FD\u6210\u4EA4\uFF1B\u89E3\u9501\u4E0D\u4EE3\u8868\u4EA4\u6613\u5DF2\u64A4\u9500\u6216\u5931\u8D25\u3002";
   if (op.status === "SUCCESS") return "\u4EA4\u6613\u5DF2\u5728\u94FE\u4E0A\u786E\u8BA4";
+  if (awaitingSettlement(op)) return "\u5356\u51FA\u5DF2\u5728\u94FE\u4E0A\u786E\u8BA4\uFF0C\u540E\u7EED BNB \u7ED3\u7B97\u672A\u5B8C\u6210\u3002" + (op.error?.message || "\u8BF7\u7EE7\u7EED\u539F\u8BA2\u5355\u5904\u7406\u5269\u4F59\u6B65\u9AA4\u3002");
   return op.error?.message || op.progress?.message || op.progress?.phase || "\u6B63\u5728\u5904\u7406\uFF0C\u8BF7\u52FF\u91CD\u590D\u70B9\u51FB";
 }
 function canQuickSell(op, state2) {

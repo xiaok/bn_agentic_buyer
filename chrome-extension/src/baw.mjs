@@ -120,6 +120,8 @@ export class Baw {
       };
       const responses = await Promise.allSettled([readPages('tx-history-pending'), readPages('tx-history-confirm')]);
       const history = { pending: responses[0].status === 'fulfilled' ? responses[0].value : [], confirmed: responses[1].status === 'fulfilled' ? responses[1].value : [] };
+      const conflict = responses.find(response => response.status === 'rejected' && response.reason?.code === 'AMBIGUOUS_HISTORY');
+      if (conflict) throw conflict.reason;
       // A temporary failure in one list must not hide exact evidence in the other.
       if (target && historyTransactionHash(history, target)) return history;
       const failure = responses.find(response => response.status === 'rejected');
