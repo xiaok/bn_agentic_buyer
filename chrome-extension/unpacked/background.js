@@ -25979,6 +25979,33 @@ var init_storage = __esm({
   }
 });
 
+// src/history.mjs
+function historyTransactionHash(history, orderId) {
+  if (orderId === void 0 || orderId === null || orderId === "") return null;
+  const hashes = /* @__PURE__ */ new Map();
+  const add = (row) => {
+    if (onBsc(row) && validHash(row.txHash)) hashes.set(row.txHash.toLowerCase(), row.txHash);
+  };
+  const visit = (row) => {
+    if (!row || typeof row !== "object") return;
+    if (onBsc(row) && ["orderId", "binanceTxId"].some((key) => row[key] !== void 0 && String(row[key]) === String(orderId))) {
+      if (validHash(row.txHash)) add(row);
+      else for (const child of row.txHashList || []) add(child);
+    }
+    for (const child of Object.values(row)) if (child && typeof child === "object") visit(child);
+  };
+  visit(history);
+  if (hashes.size > 1) throw Object.assign(new Error("\u540C\u4E00\u8BA2\u5355\u53F7\u5BF9\u5E94\u591A\u4E2A\u4EA4\u6613\u54C8\u5E0C\uFF0C\u8BF7\u6838\u5BF9\u539F\u8BA2\u5355\uFF1B\u4E0D\u4F1A\u731C\u6D4B\u6216\u91CD\u53D1"), { code: "AMBIGUOUS_HISTORY" });
+  return hashes.values().next().value || null;
+}
+var validHash, onBsc;
+var init_history = __esm({
+  "src/history.mjs"() {
+    validHash = (value) => /^0x[0-9a-f]{64}$/i.test(value || "");
+    onBsc = (row) => row.binanceChainId === void 0 || String(row.binanceChainId) === "56";
+  }
+});
+
 // src/baw.mjs
 function pairingKey() {
   const privateKey = secp256k1.utils.randomPrivateKey();
@@ -26072,6 +26099,7 @@ var init_baw = __esm({
     init_secp256k1();
     init_esm();
     init_storage();
+    init_history();
     BASE = "https://www.binance.com";
     AGENT = "/bapi/defi/v1/public/wallet-direct/agent-wallet/";
     DEX = "/bapi/defi/v1/public/wallet-direct/web-dex/agent/";
@@ -26185,9 +26213,29 @@ var init_baw = __esm({
         });
         if (group === "contract-call" && command === "execute") return this.api.request(AGENT + "contract-call/execute", "POST", { requestId: opt("requestId") });
         if (group === "wallet" && command === "tx-history") {
-          const query = "?binanceChainId=56&hideRisk=false&hideLowValue=false";
-          const [pending, confirmed] = await Promise.all([this.api.request(HISTORY + "tx-history-pending" + query), this.api.request(HISTORY + "tx-history-confirm" + query)]);
-          return { pending, confirmed };
+          const target = opt("orderId"), now = Date.now(), requestedStart = Number(opt("startTime"));
+          const startTime = Number.isFinite(requestedStart) && requestedStart >= 0 ? requestedStart : now - 90 * 24 * 60 * 60 * 1e3;
+          const readPages = async (endpoint) => {
+            const pages = [], seen = /* @__PURE__ */ new Set();
+            let cursor;
+            for (let page = 0; page < (target ? 10 : 1); page++) {
+              const params = new URLSearchParams({ binanceChainIds: "56", size: "100", startTime: String(startTime), endTime: String(now), hideRisk: "false", hideLowValue: "false" });
+              if (cursor) params.set("nextToken", cursor);
+              const data = await this.api.request(HISTORY + endpoint + "?" + params);
+              pages.push(data);
+              if (target && historyTransactionHash(pages, target)) break;
+              if (!data.nextToken || seen.has(String(data.nextToken))) break;
+              cursor = String(data.nextToken);
+              seen.add(cursor);
+            }
+            return pages;
+          };
+          const responses = await Promise.allSettled([readPages("tx-history-pending"), readPages("tx-history-confirm")]);
+          const history = { pending: responses[0].status === "fulfilled" ? responses[0].value : [], confirmed: responses[1].status === "fulfilled" ? responses[1].value : [] };
+          if (target && historyTransactionHash(history, target)) return history;
+          const failure = responses.find((response) => response.status === "rejected");
+          if (failure) throw failure.reason;
+          return history;
         }
         if (group === "market-order" && command === "list") return mapMarketOrders(await this.api.request(DEX + "batch-query-market-orders", "POST", { orderId: opt("orderId"), page: 1, pageSize: 1 }));
         if (group === "market-order" && ["quote", "swap"].includes(command)) {
@@ -27526,6 +27574,7 @@ init_core();
 init_esm();
 init_core();
 init_adapters();
+init_history();
 function previewArgs(wallet, request) {
   return [
     "contract-call",
@@ -27591,17 +27640,17 @@ var Executor = class {
   }
   async refreshPending(step) {
     if (!step.txHash && step.orderId) {
-      const history = await this.baw.call(["wallet", "tx-history", "--binanceChainId", "56"]);
-      const find = (o) => {
-        if (!o || typeof o !== "object") return null;
-        if (String(o.orderId) === String(step.orderId) && /^0x[0-9a-fA-F]{64}$/.test(o.txHash || "")) return o.txHash;
-        for (const value of Object.values(o)) {
-          const match = find(value);
-          if (match) return match;
-        }
-        return null;
-      };
-      const hash3 = find(history);
+      const createdAt = Date.parse(this.journal.data.createdAt);
+      const history = await this.baw.call([
+        "wallet",
+        "tx-history",
+        "--binanceChainId",
+        "56",
+        "--orderId",
+        String(step.orderId),
+        ...Number.isFinite(createdAt) ? ["--startTime", String(Math.max(0, createdAt - 6e4))] : []
+      ]);
+      const hash3 = historyTransactionHash(history, step.orderId);
       if (hash3) {
         step.txHash = hash3;
         await this.save();
@@ -28001,12 +28050,15 @@ function viewOperation(op) {
     result: op.result,
     error: op.lastError,
     progress: op.progress,
+    manualRelease: op.manualRelease,
     steps: Object.values(op.steps).map((s) => ({ name: s.name, status: s.status, txHash: s.txHash, orderId: s.orderId })),
     timings: op.timings
   };
 }
 async function view() {
   const auth = await store.get("auth", {}), recent = await operations();
+  const pending = recent.filter((op) => !["SUCCESS", "FAILED", "BLOCKED"].includes(op.status));
+  const visible = [...new Map([...pending, ...recent.slice(0, 12)].map((op) => [op.id, op])).values()];
   return {
     status: "VIEW",
     connected: !!auth.connected && !!auth.sessionId,
@@ -28015,7 +28067,7 @@ async function view() {
     walletSettings: await store.get("walletSettings"),
     config: await getConfig(),
     busy,
-    operations: recent.slice(0, 12).map(viewOperation)
+    operations: visible.map(viewOperation)
   };
 }
 async function checkPending(wallet, id) {
@@ -28059,12 +28111,15 @@ async function startOrder(message) {
   }
 }
 async function resumeOrder(id) {
-  const journal = await Journal.load(id);
-  if (journal.data.status === "SUCCESS") return viewOperation(journal.data);
-  if (["FAILED", "BLOCKED"].includes(journal.data.status)) throw fail2("OPERATION_STOPPED", "\u5DF2\u505C\u6B62\u7684\u8BA2\u5355\u4E0D\u81EA\u52A8\u91CD\u8BD5");
   if (busy) throw fail2("WALLET_BUSY", "\u5DF2\u6709\u64CD\u4F5C\u8FDB\u884C\u4E2D");
   busy = true;
   try {
+    const journal = await Journal.load(id);
+    if (journal.data.status === "SUCCESS") {
+      busy = false;
+      return viewOperation(journal.data);
+    }
+    if (["FAILED", "BLOCKED"].includes(journal.data.status)) throw fail2("OPERATION_STOPPED", "\u5DF2\u505C\u6B62\u6216\u624B\u52A8\u89E3\u9501\u7684\u8BA2\u5355\u4E0D\u80FD\u7EE7\u7EED\u6267\u884C");
     const cfg = journal.data.cfg;
     validateConfig(cfg);
     const baw = new Baw(cfg), [client, session] = await Promise.all([checkedClient(cfg), baw.session()]);
@@ -28077,6 +28132,26 @@ async function resumeOrder(id) {
   } catch (e) {
     busy = false;
     throw e;
+  }
+}
+async function forceUnlock(id, acknowledged) {
+  if (acknowledged !== true) throw fail2("ACKNOWLEDGEMENT_REQUIRED", "\u8BF7\u5148\u786E\u8BA4\uFF1A\u89E3\u9501\u4E0D\u4F1A\u64A4\u9500\u5DF2\u63D0\u4EA4\u4EA4\u6613\uFF0C\u91CD\u65B0\u4E0B\u5355\u53EF\u80FD\u91CD\u590D\u6210\u4EA4");
+  if (busy) throw fail2("WALLET_BUSY", "\u540E\u53F0\u4ECD\u5728\u6267\u884C\uFF0C\u8BF7\u7B49\u5F85\u5F53\u524D\u8C03\u7528\u7ED3\u675F\u540E\u518D\u89E3\u9664\u672C\u5730\u9501");
+  busy = true;
+  try {
+    const journal = await Journal.load(id);
+    if (!equal(await store.get("wallet"), journal.data.wallet)) throw fail2("WALLET_CHANGED", "\u5F53\u524D\u94B1\u5305\u4E0E\u539F\u8BA2\u5355\u4E0D\u4E00\u81F4");
+    if (["SUCCESS", "FAILED", "BLOCKED"].includes(journal.data.status)) return viewOperation(journal.data);
+    journal.data.manualRelease = {
+      at: (/* @__PURE__ */ new Date()).toISOString(),
+      previousStatus: journal.data.status,
+      acknowledgement: "\u5DF2\u77E5\u89E3\u9501\u53EA\u89E3\u9664\u672C\u5730\u963B\u62E6\uFF0C\u4E0D\u64A4\u9500\u5DF2\u63D0\u4EA4\u4EA4\u6613\uFF1B\u91CD\u65B0\u4E0B\u5355\u53EF\u80FD\u91CD\u590D\u6210\u4EA4"
+    };
+    journal.data.status = "BLOCKED";
+    await journal.save();
+    return viewOperation(journal.data);
+  } finally {
+    busy = false;
   }
 }
 function launch(client, cfg, baw, session, journal, knownMarket) {
@@ -28129,7 +28204,7 @@ function validateMessage(message, sender, extensionId) {
   }
   own ||= String(sender.url || "").startsWith("chrome-extension://" + extensionId + "/");
   if (!own && !allowedSite(sender.url)) throw new Error("\u4E0D\u5141\u8BB8\u6B64\u7F51\u9875");
-  const allowed = own ? ["VIEW", "CONNECT", "POLL_LOGIN", "SIGN_OUT", "SESSION", "CONFIG", "BUY", "SELL", "RESUME", "OPEN"] : ["VIEW", "BUY", "RESUME", "OPEN"];
+  const allowed = own ? ["VIEW", "CONNECT", "POLL_LOGIN", "SIGN_OUT", "SESSION", "CONFIG", "BUY", "SELL", "RESUME", "FORCE_UNLOCK", "OPEN"] : ["VIEW", "BUY", "RESUME", "OPEN"];
   if (!allowed.includes(message?.type)) throw new Error("\u4E0D\u5141\u8BB8\u6B64\u6307\u4EE4");
   return { own };
 }
@@ -28180,6 +28255,8 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
         return startOrder(message);
       case "RESUME":
         return resumeOrder(message.id);
+      case "FORCE_UNLOCK":
+        return forceUnlock(message.id, message.acknowledged);
       default:
         throw new Error("\u4E0D\u652F\u6301\u7684\u6307\u4EE4");
     }

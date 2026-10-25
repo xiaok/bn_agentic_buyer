@@ -12,13 +12,16 @@ export function validateConfig(cfg) {
 }
 function viewOperation(op) {
   return { id: op.id, status: op.status, createdAt: op.createdAt, intent: op.intent, wallet: op.wallet,
-    result: op.result, error: op.lastError, progress: op.progress,
+    result: op.result, error: op.lastError, progress: op.progress, manualRelease: op.manualRelease,
     steps: Object.values(op.steps).map(s => ({ name: s.name, status: s.status, txHash: s.txHash, orderId: s.orderId })), timings: op.timings };
 }
 export async function view() {
   const auth = await store.get('auth', {}), recent = await operations();
+  // An old pending record must remain reachable even after newer orders exist.
+  const pending = recent.filter(op => !['SUCCESS', 'FAILED', 'BLOCKED'].includes(op.status));
+  const visible = [...new Map([...pending, ...recent.slice(0, 12)].map(op => [op.id, op])).values()];
   return { status: 'VIEW', connected: !!auth.connected && !!auth.sessionId, wallet: await store.get('wallet'),
-    login: await store.get('login'), walletSettings: await store.get('walletSettings'), config: await getConfig(), busy, operations: recent.slice(0, 12).map(viewOperation) };
+    login: await store.get('login'), walletSettings: await store.get('walletSettings'), config: await getConfig(), busy, operations: visible.map(viewOperation) };
 }
 async function checkPending(wallet, id) {
   const pending = (await operations()).find(op => op.id !== id && equal(op.wallet, wallet) && !['SUCCESS', 'FAILED', 'BLOCKED'].includes(op.status));
@@ -57,12 +60,14 @@ export async function startOrder(message) {
   } catch (e) { busy = false; throw e; }
 }
 export async function resumeOrder(id) {
-  const journal = await Journal.load(id);
-  if (journal.data.status === 'SUCCESS') return viewOperation(journal.data);
-  if (['FAILED', 'BLOCKED'].includes(journal.data.status)) throw fail('OPERATION_STOPPED', '已停止的订单不自动重试');
   if (busy) throw fail('WALLET_BUSY', '已有操作进行中');
   busy = true;
   try {
+    // Reserve before loading, so a concurrent manual release cannot be undone
+    // by a resume call holding an older copy of the journal.
+    const journal = await Journal.load(id);
+    if (journal.data.status === 'SUCCESS') { busy = false; return viewOperation(journal.data); }
+    if (['FAILED', 'BLOCKED'].includes(journal.data.status)) throw fail('OPERATION_STOPPED', '已停止或手动解锁的订单不能继续执行');
     const cfg = journal.data.cfg; validateConfig(cfg);
     const baw = new Baw(cfg), [client, session] = await Promise.all([checkedClient(cfg), baw.session()]);
     if (!equal(session.wallet, journal.data.wallet)) throw fail('WALLET_CHANGED', '当前钱包与原订单不一致');
@@ -70,6 +75,23 @@ export async function resumeOrder(id) {
     journal.data.status = 'RUNNING'; await journal.save();
     launch(client, cfg, baw, session, journal, journal.value('detectedMarket')); return viewOperation(journal.data);
   } catch (e) { busy = false; throw e; }
+}
+export async function forceUnlock(id, acknowledged) {
+  if (acknowledged !== true) throw fail('ACKNOWLEDGEMENT_REQUIRED', '请先确认：解锁不会撤销已提交交易，重新下单可能重复成交');
+  if (busy) throw fail('WALLET_BUSY', '后台仍在执行，请等待当前调用结束后再解除本地锁');
+  busy = true;
+  try {
+    const journal = await Journal.load(id);
+    if (!equal(await store.get('wallet'), journal.data.wallet)) throw fail('WALLET_CHANGED', '当前钱包与原订单不一致');
+    if (['SUCCESS', 'FAILED', 'BLOCKED'].includes(journal.data.status)) return viewOperation(journal.data);
+    journal.data.manualRelease = { at: new Date().toISOString(), previousStatus: journal.data.status,
+      acknowledgement: '已知解锁只解除本地阻拦，不撤销已提交交易；重新下单可能重复成交' };
+    journal.data.status = 'BLOCKED';
+    // Keep every step, hash, order ID and original error for later inspection.
+    // No wallet API, chain request, cancel, signing or submission occurs here.
+    await journal.save();
+    return viewOperation(journal.data);
+  } finally { busy = false; }
 }
 function launch(client, cfg, baw, session, journal, knownMarket) {
   const started = performance.now(), metricOffset = transport.metrics.length;

@@ -1,6 +1,7 @@
 import { encodeFunctionData, parseAbi } from 'viem';
 import { Baw, developerMode, equal, fail, emit, sleep, json, NATIVE, WBNB, ZERO, erc20Delta, formatUnits, tx } from './core.mjs';
 import { balance, metadata, read, ERC20, WRAPPED } from './adapters.mjs';
+import { historyTransactionHash } from '../history.mjs';
 
 export function previewArgs(wallet, request) {
   return ['contract-call', 'preview', '--binanceChainId', '56', '--from', wallet, '--to', request.to,
@@ -37,14 +38,10 @@ export class Executor {
   }
   async refreshPending(step) {
     if (!step.txHash && step.orderId) {
-      const history = await this.baw.call(['wallet', 'tx-history', '--binanceChainId', '56']);
-      const find = (o) => {
-        if (!o || typeof o !== 'object') return null;
-        if (String(o.orderId) === String(step.orderId) && /^0x[0-9a-fA-F]{64}$/.test(o.txHash || '')) return o.txHash;
-        for (const value of Object.values(o)) { const match = find(value); if (match) return match; }
-        return null;
-      };
-      const hash = find(history);
+      const createdAt = Date.parse(this.journal.data.createdAt);
+      const history = await this.baw.call(['wallet', 'tx-history', '--binanceChainId', '56', '--orderId', String(step.orderId),
+        ...(Number.isFinite(createdAt) ? ['--startTime', String(Math.max(0, createdAt - 60000))] : [])]);
+      const hash = historyTransactionHash(history, step.orderId);
       if (hash) { step.txHash = hash; await this.save(); }
     }
     return this.waitReceipt(step);

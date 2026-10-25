@@ -21,7 +21,7 @@ export function validateMessage(message, sender, extensionId) {
   // URL.origin is "null" for extension URLs in some non-Chrome runtimes.
   own ||= String(sender.url || '').startsWith('chrome-extension://' + extensionId + '/');
   if (!own && !allowedSite(sender.url)) throw new Error('不允许此网页');
-  const allowed = own ? ['VIEW', 'CONNECT', 'POLL_LOGIN', 'SIGN_OUT', 'SESSION', 'CONFIG', 'BUY', 'SELL', 'RESUME', 'OPEN'] : ['VIEW', 'BUY', 'RESUME', 'OPEN'];
+  const allowed = own ? ['VIEW', 'CONNECT', 'POLL_LOGIN', 'SIGN_OUT', 'SESSION', 'CONFIG', 'BUY', 'SELL', 'RESUME', 'FORCE_UNLOCK', 'OPEN'] : ['VIEW', 'BUY', 'RESUME', 'OPEN'];
   if (!allowed.includes(message?.type)) throw new Error('不允许此指令');
   return { own };
 }

@@ -1,6 +1,7 @@
 import { secp256k1 } from '@noble/curves/secp256k1';
 import { getAddress } from 'viem';
 import { store, patchAuth } from './storage.mjs';
+import { historyTransactionHash } from './history.mjs';
 
 const BASE = 'https://www.binance.com';
 const AGENT = '/bapi/defi/v1/public/wallet-direct/agent-wallet/';
@@ -101,9 +102,29 @@ export class Baw {
     });
     if (group === 'contract-call' && command === 'execute') return this.api.request(AGENT + 'contract-call/execute', 'POST', { requestId: opt('requestId') });
     if (group === 'wallet' && command === 'tx-history') {
-      const query = '?binanceChainId=56&hideRisk=false&hideLowValue=false';
-      const [pending, confirmed] = await Promise.all([this.api.request(HISTORY + 'tx-history-pending' + query), this.api.request(HISTORY + 'tx-history-confirm' + query)]);
-      return { pending, confirmed }; // Preserve exact orderId; never guess by time/recipient.
+      const target = opt('orderId'), now = Date.now(), requestedStart = Number(opt('startTime'));
+      const startTime = Number.isFinite(requestedStart) && requestedStart >= 0 ? requestedStart : now - 90 * 24 * 60 * 60 * 1000;
+      const readPages = async endpoint => {
+        const pages = [], seen = new Set(); let cursor;
+        for (let page = 0; page < (target ? 10 : 1); page++) {
+          // The HTTP API uses plural binanceChainIds; the CLI flag is singular.
+          const params = new URLSearchParams({ binanceChainIds: '56', size: '100', startTime: String(startTime), endTime: String(now), hideRisk: 'false', hideLowValue: 'false' });
+          if (cursor) params.set('nextToken', cursor);
+          const data = await this.api.request(HISTORY + endpoint + '?' + params);
+          pages.push(data);
+          if (target && historyTransactionHash(pages, target)) break;
+          if (!data.nextToken || seen.has(String(data.nextToken))) break;
+          cursor = String(data.nextToken); seen.add(cursor);
+        }
+        return pages;
+      };
+      const responses = await Promise.allSettled([readPages('tx-history-pending'), readPages('tx-history-confirm')]);
+      const history = { pending: responses[0].status === 'fulfilled' ? responses[0].value : [], confirmed: responses[1].status === 'fulfilled' ? responses[1].value : [] };
+      // A temporary failure in one list must not hide exact evidence in the other.
+      if (target && historyTransactionHash(history, target)) return history;
+      const failure = responses.find(response => response.status === 'rejected');
+      if (failure) throw failure.reason;
+      return history;
     }
     if (group === 'market-order' && command === 'list') return mapMarketOrders(await this.api.request(DEX + 'batch-query-market-orders', 'POST', { orderId: opt('orderId'), page: 1, pageSize: 1 }));
     if (group === 'market-order' && ['quote', 'swap'].includes(command)) {

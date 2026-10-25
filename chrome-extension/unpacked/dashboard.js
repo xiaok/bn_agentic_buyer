@@ -2117,6 +2117,7 @@ function drawPairingQr(canvas, url) {
 var isFinished = (op) => ["SUCCESS", "FAILED", "BLOCKED"].includes(op.status);
 var orderHash = (op) => op.result?.txHash || [...op.steps].reverse().find((step) => step.txHash)?.txHash;
 function orderLabel(op) {
+  if (op.manualRelease) return "\u5DF2\u624B\u52A8\u89E3\u9501 \xB7 \u7ED3\u679C\u672A\u6838\u5B9E";
   const side = op.intent.side === "buy" ? "\u4E70\u5165" : "\u5356\u51FA";
   return {
     SUCCESS: `${side}\u6210\u529F`,
@@ -2129,6 +2130,7 @@ function orderLabel(op) {
   }[op.status] || op.status;
 }
 function orderDetail(op) {
+  if (op.manualRelease) return "\u672C\u5730\u9501\u5DF2\u89E3\u9664\uFF0C\u65E7\u8BA2\u5355\u4E0D\u4F1A\u7EE7\u7EED\u6267\u884C\u3002\u5DF2\u63D0\u4EA4\u4EA4\u6613\u4ECD\u53EF\u80FD\u6210\u4EA4\uFF1B\u89E3\u9501\u4E0D\u4EE3\u8868\u4EA4\u6613\u5DF2\u64A4\u9500\u6216\u5931\u8D25\u3002";
   if (op.status === "SUCCESS") return "\u4EA4\u6613\u5DF2\u5728\u94FE\u4E0A\u786E\u8BA4";
   return op.error?.message || op.progress?.message || op.progress?.phase || "\u6B63\u5728\u5904\u7406\uFF0C\u8BF7\u52FF\u91CD\u590D\u70B9\u51FB";
 }
@@ -2229,6 +2231,7 @@ function controls() {
   const pending = state?.operations.some((op) => !isFinished(op));
   for (const id of ["buy", "sell-half", "sell-all"]) $(id).disabled = posting || !state?.connected || state.busy || pending;
   for (const button of document.querySelectorAll("[data-quick-sell]")) button.disabled = posting || !state?.connected || state.busy || pending;
+  for (const button of document.querySelectorAll("[data-order-action]")) button.disabled = posting || state?.busy;
   $("buy").textContent = `\u4E70\u5165 ${state?.config.buyAmountBnb || "0.001"} BNB`;
 }
 async function refresh() {
@@ -2304,20 +2307,56 @@ async function refresh() {
       box.append(actions, note);
     }
     if (!isFinished(op)) {
+      const actions = document.createElement("div");
+      actions.className = "row";
       const button = document.createElement("button");
       button.className = "secondary";
       button.textContent = "App \u786E\u8BA4\u540E\uFF0F\u4E2D\u65AD\u540E\uFF0C\u7EE7\u7EED\u539F\u8BA2\u5355";
+      button.dataset.orderAction = "resume";
       button.disabled = state.busy || posting;
       button.addEventListener("click", attempt(async () => {
         await send({ type: "RESUME", id: op.id });
         feedback("\u6B63\u5728\u7EE7\u7EED\u539F\u8BA2\u5355\uFF0C\u4E0D\u91CD\u590D\u63D0\u4EA4\u5DF2\u53D1\u9001\u6B65\u9AA4\u3002");
         await refresh();
       }));
-      box.append(button);
+      const unlock = document.createElement("button");
+      unlock.type = "button";
+      unlock.className = "danger";
+      unlock.dataset.orderAction = "unlock";
+      unlock.textContent = "\u5F3A\u5236\u89E3\u9664\u672C\u5730\u9501";
+      unlock.title = "\u4E0D\u64A4\u9500\u5DF2\u63D0\u4EA4\u4EA4\u6613\uFF1B\u786E\u8BA4\u540E\u7981\u6B62\u65E7\u8BA2\u5355\u7EE7\u7EED\u6267\u884C";
+      unlock.addEventListener("click", attempt(async () => {
+        if (posting || state.busy) return;
+        const confirmed = window.confirm(`\u5F3A\u5236\u89E3\u9664\u8FD9\u7B14\u8BA2\u5355\u7684\u672C\u5730\u9501\uFF1F
+
+${op.intent.token}
+\u64CD\u4F5C ID\uFF1A${op.id}
+
+\u6B64\u64CD\u4F5C\u4E0D\u4F1A\u64A4\u9500\u5E01\u5B89\u6216\u94FE\u4E0A\u5DF2\u63D0\u4EA4\u7684\u4EA4\u6613\uFF0C\u4E5F\u4E0D\u4F1A\u786E\u8BA4\u5B83\u662F\u5426\u6210\u529F\u3002\u65E7\u4EA4\u6613\u4ECD\u53EF\u80FD\u6210\u4EA4\uFF0C\u91CD\u65B0\u4E0B\u5355\u53EF\u80FD\u91CD\u590D\u4E70\u5356\u3002
+
+\u786E\u8BA4\u540E\u4FDD\u7559\u539F\u8BA2\u5355\u8BB0\u5F55\uFF0C\u7981\u6B62\u7EE7\u7EED\u6267\u884C\u65E7\u8BA2\u5355\uFF0C\u5E76\u6062\u590D\u65B0\u4E70\u5356\u6309\u94AE\u3002`);
+        if (!confirmed) return;
+        posting = true;
+        controls();
+        try {
+          await send({ type: "FORCE_UNLOCK", id: op.id, acknowledged: true });
+          feedback("\u672C\u5730\u9501\u5DF2\u89E3\u9664\uFF1B\u65E7\u8BA2\u5355\u8BB0\u5F55\u4FDD\u7559\u4E14\u4E0D\u4F1A\u7EE7\u7EED\u6267\u884C\u3002\u8BF7\u6838\u5BF9\u94B1\u5305\u548C\u94FE\u4E0A\u7ED3\u679C\uFF0C\u907F\u514D\u91CD\u590D\u4E70\u5356\u3002");
+          notify("\u5DF2\u89E3\u9664\u672C\u5730\u9501", "\u8FD9\u4E0D\u4F1A\u64A4\u9500\u5DF2\u63D0\u4EA4\u4EA4\u6613\u3002\u8BF7\u6838\u5BF9\u94B1\u5305\u4E0E\u94FE\u4E0A\u7ED3\u679C\uFF0C\u907F\u514D\u91CD\u590D\u6210\u4EA4\u3002");
+        } finally {
+          posting = false;
+          await refresh();
+        }
+      }));
+      actions.append(button, unlock);
+      box.append(actions);
+      const note = document.createElement("p");
+      note.className = "note";
+      note.textContent = state.busy ? "\u540E\u53F0\u4ECD\u5728\u6267\u884C\uFF0C\u8C03\u7528\u7ED3\u675F\u540E\u624D\u80FD\u89E3\u9664\u672C\u5730\u9501\u3002" : "\u5361\u4F4F\u65F6\u53EF\u624B\u52A8\u89E3\u9501\uFF1B\u8FD9\u4E0D\u4F1A\u64A4\u9500\u5DF2\u63D0\u4EA4\u4EA4\u6613\uFF0C\u91CD\u65B0\u4E0B\u5355\u53EF\u80FD\u91CD\u590D\u6210\u4EA4\u3002";
+      box.append(note);
     }
     const raw = document.createElement("details"), summary = document.createElement("summary"), pre = document.createElement("pre");
     summary.textContent = "\u64CD\u4F5C ID \u4E0E\u8017\u65F6";
-    pre.textContent = JSON.stringify({ id: op.id, timings: op.timings, steps: op.steps }, null, 2);
+    pre.textContent = JSON.stringify({ id: op.id, timings: op.timings, steps: op.steps, error: op.error, manualRelease: op.manualRelease }, null, 2);
     raw.append(summary, pre);
     box.append(raw);
     $("orders").append(box);

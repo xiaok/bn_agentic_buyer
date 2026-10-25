@@ -34,6 +34,7 @@ function controls() {
   const pending = state?.operations.some(op => !isFinished(op));
   for (const id of ['buy', 'sell-half', 'sell-all']) $(id).disabled = posting || !state?.connected || state.busy || pending;
   for (const button of document.querySelectorAll('[data-quick-sell]')) button.disabled = posting || !state?.connected || state.busy || pending;
+  for (const button of document.querySelectorAll('[data-order-action]')) button.disabled = posting || state?.busy;
   $('buy').textContent = `买入 ${state?.config.buyAmountBnb || '0.001'} BNB`;
 }
 async function refresh() {
@@ -76,10 +77,27 @@ async function refresh() {
       box.append(actions, note);
     }
     if (!isFinished(op)) {
-      const button = document.createElement('button'); button.className = 'secondary'; button.textContent = 'App 确认后／中断后，继续原订单'; button.disabled = state.busy || posting;
-      button.addEventListener('click', attempt(async () => { await send({ type: 'RESUME', id: op.id }); feedback('正在继续原订单，不重复提交已发送步骤。'); await refresh(); })); box.append(button);
+      const actions = document.createElement('div'); actions.className = 'row';
+      const button = document.createElement('button'); button.className = 'secondary'; button.textContent = 'App 确认后／中断后，继续原订单'; button.dataset.orderAction = 'resume'; button.disabled = state.busy || posting;
+      button.addEventListener('click', attempt(async () => { await send({ type: 'RESUME', id: op.id }); feedback('正在继续原订单，不重复提交已发送步骤。'); await refresh(); }));
+      const unlock = document.createElement('button'); unlock.type = 'button'; unlock.className = 'danger'; unlock.dataset.orderAction = 'unlock'; unlock.textContent = '强制解除本地锁';
+      unlock.title = '不撤销已提交交易；确认后禁止旧订单继续执行';
+      unlock.addEventListener('click', attempt(async () => {
+        if (posting || state.busy) return;
+        const confirmed = window.confirm(`强制解除这笔订单的本地锁？\n\n${op.intent.token}\n操作 ID：${op.id}\n\n此操作不会撤销币安或链上已提交的交易，也不会确认它是否成功。旧交易仍可能成交，重新下单可能重复买卖。\n\n确认后保留原订单记录，禁止继续执行旧订单，并恢复新买卖按钮。`);
+        if (!confirmed) return;
+        posting = true; controls();
+        try {
+          await send({ type: 'FORCE_UNLOCK', id: op.id, acknowledged: true });
+          feedback('本地锁已解除；旧订单记录保留且不会继续执行。请核对钱包和链上结果，避免重复买卖。');
+          notify('已解除本地锁', '这不会撤销已提交交易。请核对钱包与链上结果，避免重复成交。');
+        } finally { posting = false; await refresh(); }
+      }));
+      actions.append(button, unlock); box.append(actions);
+      const note = document.createElement('p'); note.className = 'note';
+      note.textContent = state.busy ? '后台仍在执行，调用结束后才能解除本地锁。' : '卡住时可手动解锁；这不会撤销已提交交易，重新下单可能重复成交。'; box.append(note);
     }
-    const raw = document.createElement('details'), summary = document.createElement('summary'), pre = document.createElement('pre'); summary.textContent = '操作 ID 与耗时'; pre.textContent = JSON.stringify({ id: op.id, timings: op.timings, steps: op.steps }, null, 2); raw.append(summary, pre); box.append(raw); $('orders').append(box);
+    const raw = document.createElement('details'), summary = document.createElement('summary'), pre = document.createElement('pre'); summary.textContent = '操作 ID 与耗时'; pre.textContent = JSON.stringify({ id: op.id, timings: op.timings, steps: op.steps, error: op.error, manualRelease: op.manualRelease }, null, 2); raw.append(summary, pre); box.append(raw); $('orders').append(box);
   }
   controls();
 }

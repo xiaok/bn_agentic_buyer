@@ -1,6 +1,6 @@
 import { transport, startLogin, pollLogin, signOut, initializeSession } from './baw.mjs';
 import { store, getConfig, patchAuth } from './storage.mjs';
-import { view, startOrder, resumeOrder, validateConfig } from './runner.mjs';
+import { view, startOrder, resumeOrder, forceUnlock, validateConfig } from './runner.mjs';
 import { validateMessage } from './routes.mjs';
 
 const ready = chrome.storage.local.setAccessLevel({ accessLevel: 'TRUSTED_CONTEXTS' });
@@ -32,6 +32,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
       case 'BUY': return startOrder(message);
       case 'SELL': return startOrder(message);
       case 'RESUME': return resumeOrder(message.id);
+      case 'FORCE_UNLOCK': return forceUnlock(message.id, message.acknowledged);
       default: throw new Error('不支持的指令');
     }
   };

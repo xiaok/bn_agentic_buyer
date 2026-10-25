@@ -1,0 +1,10 @@
+{
+  "cancelPreservesLock": true,
+  "acknowledgedUnlockEnablesBuyAndSell": true,
+  "originalEvidenceRetained": true,
+  "noNetworkOnUnlock": true,
+  "resumeReleasedOrderRejected": true,
+  "releaseSurvivesReload": true,
+  "newOperationAccepted": true,
+  "liveTransactions": 0
+}
