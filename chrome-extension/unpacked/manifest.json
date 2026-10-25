@@ -1,0 +1,51 @@
+{
+  "manifest_version": 3,
+  "minimum_chrome_version": "120",
+  "name": "Agent Trade · BSC",
+  "version": "0.1.0",
+  "description": "Four / Flap / Gang 一键交易，默认 0.001 BNB。独立客户端，不经过聊天模型。",
+  "permissions": [
+    "storage",
+    "webRequest",
+    "declarativeNetRequestWithHostAccess"
+  ],
+  "host_permissions": [
+    "https://www.binance.com/*",
+    "https://bsc-dataseed1.bnbchain.org/*"
+  ],
+  "background": {
+    "service_worker": "background.js",
+    "type": "module"
+  },
+  "action": {
+    "default_title": "Agent Trade 设置与订单"
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "https://flap.sh/apps/agent-bonding-curve*"
+      ],
+      "js": [
+        "flap-bindings.js"
+      ],
+      "world": "MAIN",
+      "run_at": "document_idle",
+      "all_frames": false
+    },
+    {
+      "matches": [
+        "https://four.meme/*",
+        "https://flap.sh/*",
+        "https://gang.fun/*"
+      ],
+      "js": [
+        "content.js"
+      ],
+      "run_at": "document_idle",
+      "all_frames": false
+    }
+  ],
+  "content_security_policy": {
+    "extension_pages": "script-src 'self'; object-src 'none'; base-uri 'none'"
+  }
+}

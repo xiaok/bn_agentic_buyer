@@ -8,12 +8,14 @@
 
 在 Four / Flap / Gang 的 token 条目及详情页显示买入按钮，点击直接执行，无需经过聊天模型。扩展内提供首次扫码连接、默认参数、订单与恢复记录；订单旁可以卖出当前持仓的 25%、50% 或全部。提交和链上确认分别显示状态，成功后提供交易链接。悬浮面板和订单页都有平台快捷入口。
 
-1. 下载并解压 [Chrome 安装包](dist/agent-trade-chrome.zip)。
+1. 下载并解压本仓库，或 clone 到本机。
 2. 打开 `chrome://extensions`，开启开发者模式，点击“加载已解压的扩展程序”。
-3. 选择解压后包含 `manifest.json` 的 `agent-trade-chrome` 目录。
+3. 选择仓库中的 [`chrome-extension/unpacked/`](chrome-extension/unpacked/) 目录，其中已包含 `manifest.json` 和完整构建文件，无需安装依赖或编译。
 4. 点击扩展图标，连接 Binance Agentic Wallet；用 Binance App 扫码、核对配对码并确认，然后核对扩展显示的完整钱包地址。
 
-本地构建需要 Node 与 pnpm：
+也可以使用独立的 [Chrome 安装包](dist/agent-trade-chrome.zip)，解压后加载其中的 `agent-trade-chrome` 目录。
+
+修改源码后重新构建需要 Node 与 pnpm：
 
 ```bash
 pnpm --dir chrome-extension install --frozen-lockfile --ignore-scripts
@@ -57,7 +59,7 @@ Chrome 扩展与 CLI 使用各自的会话和日志。Chrome 首次连接需要�
 
 | 路径 | 内容 |
 | --- | --- |
-| `chrome-extension/` | MV3 扩展源码、构建脚本、测试和验证证据 |
+| `chrome-extension/` | MV3 扩展源码、可直接加载的 `unpacked/`、构建脚本、测试和验证证据 |
 | `skills/agent-trade/` | 原 agent CLI、可移植 skill、平台适配器和测试 |
 | `scripts/benchmark_flap_buy.py` | Flap 买入准备流程的只读基准脚本 |
 | `research/` | 来源快照、链上只读证据、基准与验证记录 |

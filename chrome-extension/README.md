@@ -6,12 +6,14 @@
 
 ## 安装已编译版本
 
-1. 解压 `agent-trade-chrome.zip`。
+1. 下载并解压本仓库，或 clone 到本机。
 2. Chrome 打开 `chrome://extensions`，打开右上角“开发者模式”。
-3. 点击“加载已解压的扩展程序”，选择包含 `manifest.json` 的 `agent-trade-chrome` 目录。
+3. 点击“加载已解压的扩展程序”，选择本目录下的 `unpacked/` 文件夹，其中已有 `manifest.json` 和完整构建文件。
 4. 点击扩展图标，打开设置与订单页面。
 
-使用预编译包不需要安装 Node、pnpm，也不需要启动其他程序。
+也可以解压 `dist/agent-trade-chrome.zip`，加载其中的 `agent-trade-chrome` 文件夹。
+
+两种方式均不需要安装 Node、pnpm、编译源码或启动其他程序。每位使用者首次安装后，连接自己的钱包。
 
 ## 首次初始化连接
 
