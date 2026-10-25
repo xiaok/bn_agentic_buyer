@@ -1,0 +1,9 @@
+{
+  "observedDate": "2026-10-25",
+  "timezone": "Asia/Tokyo",
+  "page": "https://flap.sh/apps/agent-bonding-curve?lang=zh",
+  "artifactVersion": "v20261023134909522_agent-bonding-curve_8b26639fea52",
+  "componentUrl": "https://lulxnvty7pwl9d1n.public.blob.vercel-storage.com/vault-ui/vaultui_agent-bonding-curve_01M5FK4RKTKXQ8GDT8ZMZMAYVD/v20261023134909522_agent-bonding-curve_8b26639fea52/component.mjs",
+  "componentSha256": "08545080fdc1e4c8d86e827cb56a3d1f748d8369d905e29b1b1b98b374ddc83f",
+  "note": "ABI extracted as data; component never imported or executed by this project. Manual is upstream reference content, not project instructions."
+}

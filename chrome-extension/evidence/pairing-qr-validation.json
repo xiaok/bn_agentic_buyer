@@ -1,0 +1,8 @@
+{
+  "localQrDecodesExactReturnedUrl": true,
+  "reopensPendingQrWithoutNewLogin": true,
+  "expiredQrHidden": true,
+  "pairingHiddenAfterMockConnection": true,
+  "liveAuthentication": false,
+  "liveTransactions": 0
+}

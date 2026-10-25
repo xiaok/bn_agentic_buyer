@@ -1,0 +1,21 @@
+{
+  "pnpm-lock.yaml": "7c287c687c761c956513122f351d82d9178c709ce3144a5fca14a910aaad8e41",
+  "defaults.json": "71417d31fd84a4e8dfb13f0be645a9194522b9bccfc0480741f88a8518c6c9df",
+  ".gitignore": "25bbd36be135fd98f14518086e60e9ae812c1b73744f0d9be591f83c07626b71",
+  "package.json": "fa68913b42eb081a7e38ee90a2e2cc428ea09517925778468c663cfa1e0f0cff",
+  "SKILL.md": "d5b3368b8e5b8cac0ef4f2967991660c3b7d5c0123b5f7b7beb03256d145dcd9",
+  "references/operations.md": "007079519ab9f0af110d7326ed9b9cb386b0120b4f45cd5716ddf614f69cc623",
+  "tests/core.test.mjs": "5b4549f046c07d1559d8a5f3a1eb2c45a4e359af19c4156cddb422f1273d6524",
+  "tests/flap-workflow.test.mjs": "7ddac071ed4010520e8575c4c672f6b48b4df158536fd701a6d437f91d6dc013",
+  "tests/executor.test.mjs": "ab1d2e7d0327278150dc04598c20eec3ea46bf33fa5504782d055854d143751c",
+  "tests/workflow.test.mjs": "8944e4a71366f739a3ed572758d8ba480e1362ced866cb59b8cb383f5a6042c3",
+  "agents/openai.yaml": "c92c8ce3df6e5e4a986da3aae1bd42211bd927a1b3b766b3aa7a6b9da12f635a",
+  "scripts/executor.mjs": "767cb87de716cfc9529d72f1e970a1f56a5fdf5abd4ebe06ebd28af1404a1534",
+  "scripts/trade.mjs": "cc78873e1b4674054174a5ff05db89437a4b9d2d2dab95b024ad66ce8b6192dc",
+  "scripts/core.mjs": "b7458d0eef20c326a5d8cd28410a85fce99cbf72c2362165d53d71972adc670b",
+  "scripts/agent.mjs": "950ddcf857ee07f3c5ab3ff85b54c42501af4c06a0f0fe26f53c2e5bef5c9b51",
+  "scripts/adapters.mjs": "54fc60a8dd04a0745b45150213faff040cc89f35044856460e4c20f8d0606c2c",
+  "scripts/vendor/flap-abi.json": "3603d88258121dfccff0b9d2e98d5f2f394df946e19f9302e1f6bbbf1f0a48e8",
+  "scripts/vendor/four-readonly.mjs": "0f0fd78be86ce2a040d4be8c9858d0e49823dc763adfbbd59a73516dcd0fe0e9",
+  "scripts/vendor/gang-abi.mjs": "0e61690e39acba346bbaf809c43934ed24d62a42d125f4a60503ab6ed31eb389"
+}

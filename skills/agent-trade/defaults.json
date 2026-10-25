@@ -1,0 +1,8 @@
+{
+  "buyAmountBnb": "0.001",
+  "slippageBps": 100,
+  "swapSlippageBps": 100,
+  "rpcUrl": "https://bsc-dataseed1.bnbchain.org",
+  "waitSeconds": 45,
+  "bawBin": "baw"
+}

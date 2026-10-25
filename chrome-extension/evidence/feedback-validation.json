@@ -1,0 +1,11 @@
+{
+  "quickSellExactOrderToken": true,
+  "quickSell50AndAll": true,
+  "doubleClickOneOrder": true,
+  "pendingSellDisablesActions": true,
+  "buyFailureAndSuccessNotice": true,
+  "sellSuccessNotice": true,
+  "platformLinksInBothViews": true,
+  "mockedOrdersOnly": true,
+  "liveTransactions": 0
+}

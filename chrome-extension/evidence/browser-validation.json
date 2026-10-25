@@ -1,0 +1,13 @@
+{
+  "extensionLoaded": true,
+  "realChromeDnrRulesAccepted": true,
+  "mockedPairingAndSessionReuse": true,
+  "oneClickAndDoubleClickDedup": true,
+  "syntheticClicksIgnored": true,
+  "exactDefaultBudget": "0.001",
+  "ambiguousPageDisabled": true,
+  "durableReplayNoNewOrder": true,
+  "flapCardBindsExactMarket": true,
+  "liveTransactions": 0,
+  "userWalletAccessed": false
+}

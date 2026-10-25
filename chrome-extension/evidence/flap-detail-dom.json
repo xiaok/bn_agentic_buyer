@@ -1,0 +1,119 @@
+{
+  "before": [
+    {
+      "html": "<span class=\"block truncate text-sm font-semibold text-[#eaecef] transition-colors group-hover:text-[#ffe778]\" title=\"quantum Inu\">quantum Inu</span>",
+      "props": [
+        "__reactFiber$017lqye5whc6",
+        "__reactProps$017lqye5whc6"
+      ]
+    },
+    {
+      "html": "<span class=\"min-w-0 flex-1\"><span class=\"block truncate text-sm font-semibold text-[#eaecef] transition-colors group-hover:text-[#ffe778]\" title=\"quantum Inu\">quantum Inu</span><span class=\"mt-2 flex flex-wrap items-center gap-2\"><span class=\"max-w-[110px] truncate text-xs text-[#848e9c]\">七</span><span class=\"inline-flex max-w-full items-center rounded-md border px-2.5 py-1 text-[11px] font-medium leading-none border-[#b58b20]/45 bg-[#fcd535]/[0.04] text-[#fcd535]\">曲线阶段</span></span><span class=\"mt-2 block truncate font-mono text-xs text-[#c7cdd6]\">0.081349 BNB</span></span>",
+      "props": [
+        "__reactFiber$017lqye5whc6",
+        "__reactProps$017lqye5whc6"
+      ]
+    },
+    {
+      "html": "<button type=\"button\" class=\"group relative flex min-h-[112px] w-[280px] shrink-0 snap-start items-center gap-4 overflow-hidden rounded-2xl border border-[#947a30]/45 bg-gradient-to-b from-[#25241c]/65 to-[#111519] px-4 py-3 text-left shadow-[0_1px_0_rgba(255,220,106,0.3)_inset] transition duration-200 before:pointer-events-none before:absolute before:inset-x-6 before:top-0 before:h-px before:bg-gradient-to-r before:from-transparent before:via-[#ffe3a3]/80 before:to-transparent after:pointer-events-none after:absolute after:inset-0 after:bg-[radial-gradient(ellipse_at_50%_0%,rgba(255,220,106,0.12),transparent_70%)] after:opacity-0 after:transition-opacity after:duration-200 hover:border-[#fcd535]/70 hover:shadow-[0_1px_0_rgba(255,220,106,0.6)_inset,0_0_22px_-10px_rgba(240,185,11,0.22)] hover:after:opacity-100 motion-reduce:transition-none motion-reduce:after:transition-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-[#fcd535] xl:w-[calc((100%_-_36px)/4)]\"><span aria-hidden=\"true\" title=\"底池进度 2%\" class=\"relative flex shrink-0 items-center justify-center p-[5px] h-16 w-16 sm:h-[72px] sm:w-[72px]\"><div class=\"h-full w-full rounded-[12px] transition duration-300 group-hover:border-[#fcd535]/60 text-3xl flex shrink-0 items-center justify-center overflow-hidden border border-[#525c69]/70 bg-gradient-to-br from-[#303740] via-[#191e24] to-[#0b0e11] font-semibold text-[#fcd535] shadow-[0_1px_0_rgba(255,255,255,0.16)_inset,0_5px_16px_rgba(0,0,0,0.2)]\">七</div><svg viewBox=\"0 0 72 72\" fill=\"none\" class=\"pointer-events-none absolute inset-0 h-full w-full overflow-visible\" aria-hidden=\"true\"><path d=\"M 36 2 H 55 Q 70 2 70 17 V 55 Q 70 70 55 70 H 17 Q 2 70 2 55 V 17 Q 2 2 17 2 H 36\" pathLength=\"100\" stroke=\"#46515c\" stroke-width=\"3\"></path><path d=\"M 36 2 H 55 Q 70 2 70 17 V 55 Q 70 70 55 70 H 17 Q 2 70 2 55 V 17 Q 2 2 17 2 H 36\" pathLength=\"100\" stroke=\"#4db8ff\" stroke-width=\"3.5\" stroke-linecap=\"round\" stroke-dasharray=\"1.62 100\" class=\"agent-progress-arc\" style=\"filter: drop-shadow(rgb(77, 184, 255) 0px 0px 3px); opacity: 1;\"></path><path d=\"M 36 2 H 55 Q 70 2 70 17 V 55 Q 70 70 55 70 H 17 Q 2 70 2 55 V 17 Q 2 2 17 2 H 36\" pathLength=\"100\" stroke=\"#fff8dc\" stroke-width=\"3.5\" stroke-linecap=\"round\" stroke-dasharray=\"1.62 100\" stroke-dashoffset=\"0\" class=\"agent-progress-glint\"></path></svg></span><span class=\"sr-only\">底池进度 2%</span><span class=\"min-w-0 flex-1\"><span class=\"block truncate text-sm font-semibold text-[#eaecef] transition-colors group-hover:text-[#ffe778]\" title=\"quantum Inu\">quantum Inu</span><span class=\"mt-2 flex flex-wrap items-center gap-2\"><span class=\"max-w-[110px] truncate text-xs text-[#848e9c]\">七</span><span class=\"inline-flex max-w-full items-center rounded-md border px-2.5 py-1 text-[11px] font-medium leading-none border-[#b58b20]/45 bg-[#fcd535]/[0.04] text-[#fcd535]\">曲线阶段</span></span><span class=\"mt-2 block truncate font-mono text-xs text-[#c7cdd6]\">0.081349 BNB</span></span></button>",
+      "props": [
+        "__reactFiber$017lqye5whc6",
+        "__reactProps$017lqye5whc6"
+      ]
+    },
+    {
+      "html": "<div class=\"flex snap-x snap-mandatory gap-3 overflow-x-auto scroll-smooth px-4 pb-4 pt-2 motion-reduce:scroll-auto [scrollbar-width:none] [&amp;::-webkit-scrollbar]:hidden sm:px-5\"><button type=\"button\" class=\"group relative flex min-h-[112px] w-[280px] shrink-0 snap-start items-center gap-4 overflow-hidden rounded-2xl border border-[#947a30]/45 bg-gradient-to-b from-[#25241c]/65 to-[#111519] px-4 py-3 text-left shadow-[0_1px_0_rgba(255,220,106,0.3)_inset] transition duration-200 before:pointer-events-none before:absolute before:inset-x-6 before:top-0 before:h-px before:bg-gradient-to-r before:from-transparent before:via-[#ffe3a3]/80 before:to-transparent after:pointer-events-none after:absolute after:inset-0 after:bg-[radial-gradient(ellipse_at_50%_0%,rgba(255,220,106,0.12),transparent_70%)] after:opacity-0 after:transition-opacity after:duration-200 hover:border-[#fcd535]/70 hover:shadow-[0_1px_0_rgba(255,220,106,0.6)_inset,0_0_22px_-10px_rgba(240,185,11,0.22)] hover:after:opacity-100 motion-reduce:transition-none motion-reduce:after:transition-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-[#fcd535] xl:w-[calc((100%_-_36px)/4)]\"><span aria-hidden=\"true\" title=\"底池进度 2%\" class=\"relative flex shrink-0 items-center justify-center p-[5px] h-16 w-16 sm:h-[72px] sm:w-[72px]\"><div class=\"h-full w-full rounded-[12px] transition duration-300 group-hover:border-[#fcd535]/60 text-3xl flex shrink-0 items-center justify-center overflow-hidden border border-[#525c69]/70 bg-gradient-to-br from-[#303740] via-[#191e24] to-[#0b0e11] font-semibold text-[#fcd535] shadow-[0_1px_0_rgba(255,255,255,0.16)_inset,0_5px_16px_rgba(0,0,0,0.2)]\">七</div><svg viewBox=\"0 0 72 72\" fill=\"none\" class=\"pointer-events-none absolute inset-0 h-full w-full overflow-visible\" aria-hidden=\"true\"><path d=\"M 36 2 H 55 Q 70 2 70 17 V 55 Q 70 70 55 70 H 17 Q 2 70 2 55 V 17 Q 2 2 17 2 H 36\" pathLength=\"100\" stroke=\"#46515c\" stroke-width=\"3\"></path><path d=\"M 36 2 H 55 Q 70 2 70 17 V 55 Q 70 70 55 70 H 17 Q 2 70 2 55 V 17 Q 2 2 17 2 H 36\" pathLength=\"100\" stroke=\"#4db8ff\" stroke-width=\"3.5\" stroke-linecap=\"round\" stroke-dasharray=\"1.62 100\" class=\"agent-progress-arc\" style=\"filter: drop-shadow(rgb(77, 184, 255) 0px 0px 3px); opacity: 1;\"></path><path d=\"M 36 2 H 55 Q 70 2 70 17 V 55 Q 70 70 55 70 H 17 Q 2 70 2 55 V 17 Q 2 2 17 2 H 36\" pathLength=\"100\" stroke=\"#fff8dc\" stroke-width=\"3.5\" stroke-linecap=\"round\" stroke-dasharray=\"1.62 100\" stroke-dashoffset=\"0\" class=\"agent-progress-glint\"></path></svg></span><span class=\"sr-only\">底池进度 2%</span><span class=\"min-w-0 flex-1\"><span class=\"block truncate text-sm font-semibold text-[#eaecef] transition-colors group-hover:text-[#ffe778]\" title=\"quantum Inu\">quantum Inu</span><span class=\"mt-2 flex flex-wrap items-center gap-2\"><span class=\"max-w-[110px] truncate text-xs text-[#848e9c]\">七</span><span class=\"inline-flex max-w-full items-center rounded-md border px-2.5 py-1 text-[11px] font-medium leading-none border-[#b58b20]/45 bg-[#fcd535]/[0.04] text-[#fcd535]\">曲线阶段</span></span><span class=\"mt-2 block truncate font-mono text-xs text-[#c7cdd6]\">0.081349 BNB</span></span></button><button type=\"button\" class=\"group relative flex min-h-[112px] w-[280px] shrink-0 snap-start items-center gap-4 overflow-hidden rounded-2xl border border-[#947a30]/45 bg-gradient-to-b from-[#25241c]/65 to-[#111519] px-4 py-3 text-left shadow-[0_1px_0_rgba(255,220,106,0.3)_inset] transition duration-200 before:pointer-events-none before:absolute before:inset-x-6 before:top-0 before:h-px before:bg-gradient-to-r before:from-transparent before:via-[#ffe3a3]/80 before:to-transparent after:pointer-events-none after:absolute after:inset-0 after:bg-[radial-gradient(ellipse_at_50%_0%,rgba(255,220,106,0.12),transparent_70%)] after:opacity-0 after:transition-opacity after:duration-200 hover:border-[#fcd535]/70 hover:shadow-[0_1px_0_rgba(255,220,106,0.6)_inset,0_0_22px_-10px_rgba(240,185,11,0.22)] hover:after:opacity-100 motion-reduce:transition-none motion-reduce:after:transition-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-[#fcd535] xl:w-[calc((100%_-_36px)/4)]\"><span aria-hidden=\"true\" title=\"底池进度 2%\" class=\"relative flex shrink-0 items-center justify-center p-[5px] h-16 w-16 sm:h-[72px] sm:w-[72px]\"><div class=\"h-full w-full rounded-[12px] transition duration-300 group-hover:border-[#fcd535]/60 text-3xl flex shrink-0 items-center ",
+      "props": [
+        "__reactFiber$017lqye5whc6",
+        "__reactProps$017lqye5whc6"
+      ]
+    }
+  ],
+  "after": {
+    "url": "https://flap.sh/apps/agent-bonding-curve?lang=zh",
+    "text": "創建代幣\n搜索\nBSC\n连接钱包\n小程序\nID AGENT CURVE 曲线市场\n创建者\n--\n代币\n--\nID AGENT CURVE\n市场\nBSC\n连接钱包\n发射代币\n\nID AGENT CURVE\n\nquantum Inu\n底池币种 · BNB\n当前市场的价格走势与 AI 操作提示词。\n全市场底池 / 发射门槛\n0.081349 BNB / 5 BNB\n预测代币地址\n仅供预览，暂不能直接交易\n\n0x8FC3C828A36F72Ed1bc4A1f5d56362D200E67777\n\nMarket 地址\n\n复制市场配置\n\n0x39600366D55D4B5F2F2935d7c2B8C5E0549B97e0\n\n价格走势\n1H\n4H\n1D\n7D\nALL\n\n$0.0₅42105\n\n最新报价 · 约 USD / 份内部曲线份额\n\n$0.0₅43372\n$0.0₅43003\n$0.0₅42633\n$0.0₅42263\n$0.0₅41894\n$0.0₅42105\n20:52\n21:22\n21:52\nUSD 参考价 · 按当前汇率估算\n7 笔已索引成交\n说明\n内盘成交\n方向\t实付 / 实收 BNB\t曲线代币份额\tAGENT\t交易哈希\n卖出\t0.018834\t3,232,643.033466\t\nad888.ai\n\t0x7698…ac87\n买入\t0.0003\t50,335.867833\t\nb1b.ai\n\t0xbf7b…45bd\n买入\t0.01158\t1,946,524.766898\t\nbullcome.ai\n\t0xf401…e558\n卖出\t0.010081\t1,728,708.979987\t\ndanny.ai\n\t0xda44…c673\n卖出\t0.003851\t658,983.384606\t\nsensi1.ai\n\t0x3b30…6c8a\n买入\t0.001\t167,683.960796\t\nalber.ai\n\t0x8aa8…e050\n卖出\t0.058999\t10,000,000\t\nens.ai\n\t0x9e59…3bd3\n买入\t0.004\t658,983.384606\t\nsensi1.ai\n\t0x8305…5f9b\n卖出\t0.059873\t9,974,258.902466\t\ncfgogogo.ai\n\t0x0111…873f\n卖出\t0.059914\t9,798,316.583816\t\nbnr.ai\n\t0xeafc…3805\n买入\t0.020286\t3,232,643.033466\t\nad888.ai\n\t0xfaf4…1ae1\n买入\t0.05\t8,052,341.964242\t\nbullcome.ai\n\t0xe6be…14c8\n买入\t0.013518\t2,197,930.753708\t\njohantsao.ai\n\t0x05f9…dcdb\n买入\t0.01\t1,631,798.694257\t\nlanyi.ai\n\t0x1647…91a3\n买入\t0.060625\t10,000,000\t\nens.ai\n\t0xeb6e…72bf\n卖出\t0.001344\t228,235.146515\t\n5288.ai\n\t0x29cd…e8cf\n买入\t0.058353\t9,798,316.583816\t\nbnr.ai\n\t0x6a9e…2e70\n买入\t0.001347\t228,235.146515\t\n5288.ai\n\t0x4978…8118\n买入\t0.058314\t9,974,258.902466\t\ncfgogogo.ai\n\t0x0850…1cba\n买入\t0.01\t1,728,708.979987\t\ndanny.ai\n\t0xebd7…f88f\nAI 操作提示词\nAI\n\n复制对应的英文操作提示词并发送给 Binance AI（Bibi），即可在对话中指定买卖金额、比例和滑点。\n\n买入\n仅内盘\n卖出\n仅内盘\n领取\n发射后\n查询持仓\n所有阶段\nFlap 交易\n发射后\nAI 交互规范 Skills\nAI\n\n复制当前市场的完整交互规范并发送给 Binance AI（Bibi），之后可在对话中直接提出查询、买入、卖出或领取要求。\n\n当前市场配置\n复制市场配置\n复制完整规范\n查看完整原文\n首页\n机制模板\n小程序\n锁仓\n文档\n社区\n更多\n语言\n中文",
+    "links": [
+      {
+        "text": "ad888.ai",
+        "href": "https://bscscan.com/address/0x6f3c64942df65f2924415b83a89229b27a369857"
+      },
+      {
+        "text": "b1b.ai",
+        "href": "https://bscscan.com/address/0x0f340232d71c4fb6d4520d5fb8b93f314a8a962d"
+      },
+      {
+        "text": "bullcome.ai",
+        "href": "https://bscscan.com/address/0x0907555673eda09b6d60469eac215666e6bfb428"
+      },
+      {
+        "text": "danny.ai",
+        "href": "https://bscscan.com/address/0xc2ef3ef28549372b4fd19b4393fe97fc8c21e066"
+      },
+      {
+        "text": "sensi1.ai",
+        "href": "https://bscscan.com/address/0xa3280e2fbe5552da66a134057364c2a771a42db3"
+      },
+      {
+        "text": "alber.ai",
+        "href": "https://bscscan.com/address/0xb719fc73b62b831c17ba255c08157bc9eb977747"
+      },
+      {
+        "text": "ens.ai",
+        "href": "https://bscscan.com/address/0x5dde026a7442aad57f573051cc272cd8342fa2bb"
+      },
+      {
+        "text": "sensi1.ai",
+        "href": "https://bscscan.com/address/0xa3280e2fbe5552da66a134057364c2a771a42db3"
+      },
+      {
+        "text": "cfgogogo.ai",
+        "href": "https://bscscan.com/address/0xdeb17682223fc3a090ac267b27597e3d4a899a88"
+      },
+      {
+        "text": "bnr.ai",
+        "href": "https://bscscan.com/address/0x299c3516370ef7a13dd5598363ebd952629373bb"
+      },
+      {
+        "text": "ad888.ai",
+        "href": "https://bscscan.com/address/0x6f3c64942df65f2924415b83a89229b27a369857"
+      },
+      {
+        "text": "bullcome.ai",
+        "href": "https://bscscan.com/address/0x0907555673eda09b6d60469eac215666e6bfb428"
+      },
+      {
+        "text": "johantsao.ai",
+        "href": "https://bscscan.com/address/0xb92f509a35cbfbe95fa95f44455bdc79fc969a6b"
+      },
+      {
+        "text": "lanyi.ai",
+        "href": "https://bscscan.com/address/0xda391a100fef3bc20056801546c0538acf7ea398"
+      },
+      {
+        "text": "ens.ai",
+        "href": "https://bscscan.com/address/0x5dde026a7442aad57f573051cc272cd8342fa2bb"
+      },
+      {
+        "text": "5288.ai",
+        "href": "https://bscscan.com/address/0xeea630cbcba3c0923a08438ef7bfaa66e14d445a"
+      },
+      {
+        "text": "bnr.ai",
+        "href": "https://bscscan.com/address/0x299c3516370ef7a13dd5598363ebd952629373bb"
+      },
+      {
+        "text": "5288.ai",
+        "href": "https://bscscan.com/address/0xeea630cbcba3c0923a08438ef7bfaa66e14d445a"
+      },
+      {
+        "text": "cfgogogo.ai",
+        "href": "https://bscscan.com/address/0xdeb17682223fc3a090ac267b27597e3d4a899a88"
+      },
+      {
+        "text": "danny.ai",
+        "href": "https://bscscan.com/address/0xc2ef3ef28549372b4fd19b4393fe97fc8c21e066"
+      }
+    ],
+    "attributes": []
+  }
+}

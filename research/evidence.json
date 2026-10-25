@@ -1,0 +1,119 @@
+{
+  "observedDate": "2026-10-25",
+  "timezone": "Asia/Tokyo",
+  "scope": "Research and read-only verification; no wallet sign-in, signatures, approvals, or trades",
+  "github": [
+    {
+      "repository": "binance/binance-skills-hub",
+      "path": "skills/binance-web3/binance-agentic-wallet/scripts/agent-id-exclusive-token-launches.mjs",
+      "blobSha": "8f97c0b326963801c30398a25bc18e27f9fcf234",
+      "url": "https://github.com/binance/binance-skills-hub/blob/main/skills/binance-web3/binance-agentic-wallet/scripts/agent-id-exclusive-token-launches.mjs"
+    },
+    {
+      "repository": "gangfun/cli",
+      "path": "src/chain.js",
+      "blobSha": "cf7fbf67fce427b51f62269a433af91d791acdab",
+      "url": "https://github.com/gangfun/cli/blob/main/src/chain.js"
+    },
+    {
+      "repository": "gangfun/cli",
+      "path": "src/abi.js",
+      "blobSha": "d6a2d03049beac450c8ff29fc9e51c8afd2bd45e",
+      "url": "https://github.com/gangfun/cli/blob/main/src/abi.js"
+    },
+    {
+      "repository": "gangfun/cli",
+      "path": "README.md",
+      "blobSha": "ce328de607ddb0eb1fb14af6edb1b13ffca7f4df",
+      "url": "https://github.com/gangfun/cli/blob/main/README.md"
+    },
+    {
+      "repository": "gangfun/gang-launchpad",
+      "path": "src/launchpad-v2/LaunchpadV2.sol",
+      "blobSha": "b35a2dd033e3a9d2b4fc6af87287bf7e8c119c45",
+      "url": "https://github.com/gangfun/gang-launchpad/blob/main/src/launchpad-v2/LaunchpadV2.sol"
+    }
+  ],
+  "checks": [
+    {
+      "platform": "four-agent-id",
+      "block": 129696652,
+      "input": "0xc56a0cebf544fcb149798bf39f4acd7fbd22ffff",
+      "method": "Binance official read-only info",
+      "result": {
+        "presetId": "1778027615735",
+        "isAgentIdExclusive": true,
+        "market": "inner",
+        "route": "contract-call",
+        "phase": 1,
+        "symbol": "大肥鱼",
+        "quote": "0xbb4cdb9cbd36b01bd1cbaebf2de08d9173bc095c",
+        "core": "0xebe7b6c1089d9f72ad07f34e36d898e44e5e27f3",
+        "tools": "0x97da82f56fef1a0b974587a48135fa9da2a4e905"
+      }
+    },
+    {
+      "platform": "flap-agent-curve",
+      "block": 129696652,
+      "method": "Factory.isMarket / marketOfToken; Reader.probeOfToken",
+      "input": "0xfc0f0592edcc6e96efb5fb5e9ca48db3fb757777",
+      "result": {
+        "market": "0x05cfb64282bf8f9cf5afeb9fe38f7354fed094f0",
+        "isMarket": true,
+        "probe": "0xa56efb142e712d8e2dcd15854c5ebd9fadd47e86"
+      }
+    },
+    {
+      "platform": "flap-agent-curve",
+      "block": 129696652,
+      "method": "Probe.assetProbe() eth_call, intentional Error(string)",
+      "result": "MARKET=0x05cfb64282bf8f9cf5afeb9fe38f7354fed094f0;QUOTE=0x0000000000000000000000000000000000000000;DECIMALS=18;END"
+    },
+    {
+      "platform": "flap-agent-curve",
+      "block": 129696652,
+      "method": "Probe.marketProbe() eth_call, intentional Error(string)",
+      "result": "POOL_WEI=98978939692496;CAP_WEI=5000000000000000000;ROOM_WEI=4999901021060307504;PHASE=1;BLOCK=129696652;END"
+    },
+    {
+      "platform": "flap-agent-curve",
+      "blockTag": "latest",
+      "method": "eth_getCode of predicted token",
+      "input": "0xfc0f0592edcc6e96efb5fb5e9ca48db3fb757777",
+      "result": "0x"
+    },
+    {
+      "platform": "gang-v2",
+      "blockTag": "latest",
+      "method": "curves(token)",
+      "input": "0xd2e747091932785c5b63afbb8653f2520a782efa",
+      "result": {
+        "creator": "0x0f4744c35774ef5636afd931614035ee2ecc4e64",
+        "quote": "0x0c6302401aa5325c2e36f170f52c00b1d220b405",
+        "graduated": false,
+        "taxed": true
+      }
+    },
+    {
+      "platform": "gang-v2",
+      "blockTag": "latest",
+      "method": "curves(fourToken)",
+      "input": "0xc56a0cebf544fcb149798bf39f4acd7fbd22ffff",
+      "result": {
+        "creator": "0x0000000000000000000000000000000000000000"
+      }
+    },
+    {
+      "platform": "flap-agent-curve",
+      "blockTag": "latest",
+      "method": "Factory.probeOfMarket(fourToken)",
+      "input": "0xc56a0cebf544fcb149798bf39f4acd7fbd22ffff",
+      "result": "0x0000000000000000000000000000000000000000"
+    }
+  ],
+  "limitations": [
+    "No baw executable was present in PATH; no authenticated wallet or end-to-end signing tests performed.",
+    "BSC public RPC returned missing trie node on an old block; fresh latest reads worked. RPC errors must never be classified as unsupported tokens.",
+    "Source documents conflict across versions. Prefer versioned source and current chain state; no trade-success or latency claims are made."
+  ]
+}

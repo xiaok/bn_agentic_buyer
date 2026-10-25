@@ -1,0 +1,10 @@
+{
+  "name": "@local/agent-trade-skill",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "engines": { "node": ">=22" },
+  "bin": { "agent": "scripts/agent.mjs" },
+  "scripts": { "agent": "node scripts/agent.mjs", "test": "node --test tests/*.test.mjs" },
+  "dependencies": { "viem": "2.57.11" }
+}

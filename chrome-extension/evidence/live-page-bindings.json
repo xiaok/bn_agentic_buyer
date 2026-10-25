@@ -1,0 +1,26 @@
+[
+  {
+    "site": "four",
+    "url": "https://four.meme/zh-TW/contract/1778027615735",
+    "inlineButtons": 21,
+    "selectedAddress": "0x2dac8ce9d9935b5b93d1839caafca5536b95ffff",
+    "exactBinding": true,
+    "walletNetworkCalls": 0
+  },
+  {
+    "site": "flap",
+    "url": "https://flap.sh/apps/agent-bonding-curve?lang=zh",
+    "inlineButtons": 91,
+    "selectedAddress": "0x39600366D55D4B5F2F2935d7c2B8C5E0549B97e0",
+    "exactBinding": true,
+    "walletNetworkCalls": 0
+  },
+  {
+    "site": "gang",
+    "url": "https://gang.fun/",
+    "inlineButtons": 84,
+    "selectedAddress": "0x0c6302401aa5325c2e36f170f52c00b1d220b405",
+    "exactBinding": true,
+    "walletNetworkCalls": 0
+  }
+]

@@ -1,0 +1,3 @@
+interface:
+  display_name: "Agent Trade"
+  short_description: "Execute BSC launchpad trades through an existing BAW session"

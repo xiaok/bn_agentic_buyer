@@ -1,0 +1,33 @@
+[
+  {
+    "platform": "four",
+    "phase": "curve",
+    "token": "0xc56a0cebf544fcb149798bf39f4acd7fbd22ffff",
+    "quote": "0xbb4cdb9cbd36b01bd1cbaebf2de08d9173bc095c",
+    "readonly": true,
+    "broadcast": false,
+    "planStatus": "DRY_RUN",
+    "localTradeSimulation": "skipped",
+    "elapsedMs": 319
+  },
+  {
+    "platform": "flap",
+    "phase": "curve",
+    "token": "0xfC0f0592eDCC6E96efb5Fb5E9CA48db3fb757777",
+    "quote": "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+    "readonly": true,
+    "broadcast": false,
+    "planStatus": "DRY_RUN",
+    "localTradeSimulation": "skipped",
+    "elapsedMs": 238
+  },
+  {
+    "platform": "gang",
+    "phase": "curve",
+    "token": "0xD2e747091932785c5b63afBb8653f2520a782EFA",
+    "quote": "0x0c6302401aa5325C2E36F170f52C00B1d220B405",
+    "readonly": true,
+    "broadcast": false,
+    "elapsedMs": 74
+  }
+]

@@ -1,0 +1,19 @@
+{
+  "name": "agent-trade-chrome",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "node build.mjs",
+    "test": "node --test tests/*.test.mjs"
+  },
+  "dependencies": {
+    "@noble/curves": "1.9.1",
+    "qrcode": "1.5.4",
+    "viem": "2.57.11"
+  },
+  "devDependencies": {
+    "esbuild": "0.25.12",
+    "jsqr": "1.4.0"
+  }
+}
