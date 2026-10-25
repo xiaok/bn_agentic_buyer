@@ -49,3 +49,30 @@ test('App-confirmed binanceTxId is reconciled by receipt and exact calldata with
   await assert.rejects(executor.contract('trade', {}), { code: 'RECEIPT_MISMATCH' });
   assert.notEqual(step.status, 'CONFIRMED');
 });
+
+test('large Binance order IDs remain exact strings; unsafe numeric IDs cannot match', () => {
+  const id = '26102500000000000001', rounded = Number(id);
+  assert.equal(historyTransactionHash([{ binanceTxId: id, txHash: hash }], id), hash);
+  assert.equal(historyTransactionHash([{ binanceTxId: rounded, txHash: hash }], String(rounded)), null);
+  assert.equal(historyTransactionHash([{ binanceTxId: String(rounded), txHash: hash }], rounded), null);
+  assert.equal(historyTransactionHash([{ binanceTxId: '26102500000000000002', txHash: otherHash }], id), null);
+  assert.equal(historyTransactionHash([{ orderId: 42, txHash: hash }], '42'), hash);
+});
+test('top-level history hash cannot hide a conflicting BSC child hash', () => {
+  assert.throws(() => historyTransactionHash([{ binanceTxId: 'own', binanceChainId: '56', txHash: hash, txHashList: [{ binanceChainId: '56', txHash: otherHash }] }], 'own'), { code: 'AMBIGUOUS_HISTORY' });
+  assert.equal(historyTransactionHash([{ binanceTxId: 'own', binanceChainId: '56', txHash: hash, txHashList: [{ binanceChainId: '56', txHash: hash }] }], 'own'), hash);
+});
+test('nested hashes require a BSC chain identity and cannot escape a different-chain parent', () => {
+  assert.equal(historyTransactionHash([{ orderId: 'own', txHashList: [{ txHash: hash }] }], 'own'), null);
+  assert.equal(historyTransactionHash([{ orderId: 'own', binanceChainId: '56', txHashList: [{ txHash: hash }] }], 'own'), hash);
+  assert.equal(historyTransactionHash([{ binanceChainId: '1', child: { orderId: 'own', txHash: hash } }], 'own'), null);
+});
+
+test('a conflicting history page is never hidden by a successful sibling endpoint', async () => {
+  const baw = new Baw({}, { async request(path) {
+    return path.includes('tx-history-pending')
+      ? { list: [{ orderId: 'own', txHash: hash }, { orderId: 'own', txHash: otherHash }] }
+      : { list: [{ orderId: 'own', txHash: hash }] };
+  } });
+  await assert.rejects(baw.call(['wallet', 'tx-history', '--orderId', 'own']), { code: 'AMBIGUOUS_HISTORY' });
+});

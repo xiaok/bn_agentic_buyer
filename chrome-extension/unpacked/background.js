@@ -25981,16 +25981,22 @@ var init_storage = __esm({
 
 // src/history.mjs
 function historyTransactionHash(history, orderId) {
-  if (orderId === void 0 || orderId === null || orderId === "") return null;
+  const target = exactId(orderId);
+  if (!target) return null;
   const hashes = /* @__PURE__ */ new Map();
   const add = (row) => {
     if (onBsc(row) && validHash(row.txHash)) hashes.set(row.txHash.toLowerCase(), row.txHash);
   };
   const visit = (row) => {
     if (!row || typeof row !== "object") return;
-    if (onBsc(row) && ["orderId", "binanceTxId"].some((key) => row[key] !== void 0 && String(row[key]) === String(orderId))) {
-      if (validHash(row.txHash)) add(row);
-      else for (const child of row.txHashList || []) add(child);
+    if (!onBsc(row)) return;
+    if (["orderId", "binanceTxId"].some((key) => exactId(row[key]) === target)) {
+      add(row);
+      for (const child of Array.isArray(row.txHashList) ? row.txHashList : []) {
+        if (!child || typeof child !== "object") continue;
+        if (child.binanceChainId === void 0 && row.binanceChainId === void 0) continue;
+        add({ ...child, binanceChainId: child.binanceChainId ?? row.binanceChainId });
+      }
     }
     for (const child of Object.values(row)) if (child && typeof child === "object") visit(child);
   };
@@ -25998,10 +26004,11 @@ function historyTransactionHash(history, orderId) {
   if (hashes.size > 1) throw Object.assign(new Error("\u540C\u4E00\u8BA2\u5355\u53F7\u5BF9\u5E94\u591A\u4E2A\u4EA4\u6613\u54C8\u5E0C\uFF0C\u8BF7\u6838\u5BF9\u539F\u8BA2\u5355\uFF1B\u4E0D\u4F1A\u731C\u6D4B\u6216\u91CD\u53D1"), { code: "AMBIGUOUS_HISTORY" });
   return hashes.values().next().value || null;
 }
-var validHash, onBsc;
+var validHash, exactId, onBsc;
 var init_history = __esm({
   "src/history.mjs"() {
     validHash = (value) => /^0x[0-9a-f]{64}$/i.test(value || "");
+    exactId = (value) => typeof value === "string" ? value : typeof value === "number" && Number.isSafeInteger(value) ? String(value) : null;
     onBsc = (row) => row.binanceChainId === void 0 || String(row.binanceChainId) === "56";
   }
 });
@@ -26232,6 +26239,8 @@ var init_baw = __esm({
           };
           const responses = await Promise.allSettled([readPages("tx-history-pending"), readPages("tx-history-confirm")]);
           const history = { pending: responses[0].status === "fulfilled" ? responses[0].value : [], confirmed: responses[1].status === "fulfilled" ? responses[1].value : [] };
+          const conflict = responses.find((response) => response.status === "rejected" && response.reason?.code === "AMBIGUOUS_HISTORY");
+          if (conflict) throw conflict.reason;
           if (target && historyTransactionHash(history, target)) return history;
           const failure = responses.find((response) => response.status === "rejected");
           if (failure) throw failure.reason;
