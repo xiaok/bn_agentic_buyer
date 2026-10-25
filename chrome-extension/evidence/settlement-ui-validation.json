@@ -1,0 +1,10 @@
+{
+  "version": "0.1.2",
+  "dashboardShowsConfirmedSellAwaitingSettlement": true,
+  "contentPanelShowsConfirmedSellAwaitingSettlement": true,
+  "linksPreferTradeOverLateApproval": true,
+  "pendingSettlementStillBlocksNewOrders": true,
+  "manualUnlockStillAvailable": true,
+  "walletNetworkRequests": 0,
+  "liveTransactions": 0
+}

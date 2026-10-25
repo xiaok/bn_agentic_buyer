@@ -7,7 +7,7 @@ await build({ entryPoints: { background: 'src/background.mjs', dashboard: 'src/d
 await build({ entryPoints: ['src/content.mjs'], outfile: outdir + '/content.js', bundle: true, format: 'iife', platform: 'browser', target: 'chrome120' });
 await copyFile('src/dashboard.html', outdir + '/dashboard.html'); await copyFile('src/dashboard.css', outdir + '/dashboard.css');
 await copyFile('src/flap-bindings.js', outdir + '/flap-bindings.js');
-await writeFile(outdir + '/manifest.json', JSON.stringify({ manifest_version: 3, minimum_chrome_version: '120', name: 'Agent Trade · BSC', version: '0.1.1',
+await writeFile(outdir + '/manifest.json', JSON.stringify({ manifest_version: 3, minimum_chrome_version: '120', name: 'Agent Trade · BSC', version: '0.1.2',
   description: 'Four / Flap / Gang 一键交易，默认 0.001 BNB。独立客户端，不经过聊天模型。',
   permissions: ['storage', 'webRequest', 'declarativeNetRequestWithHostAccess'],
   host_permissions: ['https://www.binance.com/*', 'https://bsc-dataseed1.bnbchain.org/*'],
