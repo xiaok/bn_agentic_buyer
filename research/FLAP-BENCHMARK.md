@@ -21,7 +21,7 @@
 
 各阶段的中位数之和不要求等于整轮中位数。
 
-发送人使用该市场已公开的历史交易地址 `0x9aec85a0db856183d425f4d4c7e6f275c17627d9`，仅作为 eth_call 的 from。它有 Agent ID 和足够 BNB；这不是用户的钱包，不代表用户自己的资格和余额已验证。没有覆盖或伪造余额、身份或合约状态。
+发送人使用该市场已公开的历史交易地址 `PUBLIC_REFERENCE_ACCOUNT`，仅作为 eth_call 的 from。它有 Agent ID 和足够 BNB；这不是用户的钱包，不代表用户自己的资格和余额已验证。没有覆盖或伪造余额、身份或合约状态。
 
 当前市场是原生 BNB 内盘，不需换币和 ERC20 授权。模拟成功返回的是内部 shares，未发生实际到账。
 
@@ -47,7 +47,7 @@
 ```bash
 python3 scripts/benchmark_flap_buy.py \
   0xfC0f0592eDCC6E96efb5Fb5E9CA48db3fb757777 \
-  --from 0x9aec85a0db856183d425f4d4c7e6f275c17627d9 \
+  --from "$PUBLIC_REFERENCE_ACCOUNT" \
   --bnb 0.01 --slippage-bps 100 --runs 7
 ```
 

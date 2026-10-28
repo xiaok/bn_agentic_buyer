@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "minimum_chrome_version": "120",
   "name": "Agent Trade · BSC",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "description": "Four / Flap / Gang 一键交易，默认 0.001 BNB。独立客户端，不经过聊天模型。",
   "permissions": [
     "storage",

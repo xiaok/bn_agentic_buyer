@@ -7,6 +7,7 @@ function open(s) { if (!['curve', 'dex', 'flap-curve'].includes(s.phase)) throw 
 function payment(s) {
   if (s.phase === 'dex') return NATIVE;
   if (s.platform === 'four') return NATIVE; // Official Core builder includes native Zap when supported.
+  if (s.platform === 'gang' && s.version === 'merged-v3' && s.nativeBuy) return NATIVE;
   if (s.platform === 'flap' && s.phase === 'flap-curve') {
     return s.flapState.nativeToQuoteSwapEnabled || equal(s.flapState.quoteTokenAddress, ZERO) ? NATIVE : s.flapState.quoteTokenAddress;
   }
@@ -115,7 +116,7 @@ export async function runTrade(client, cfg, market, session, journal, baw) {
   let quantity;
   if (intent.side === 'buy') {
     // Reject missing identity/room before any wrap, swap or approval spends gas.
-    if (s.platform === 'gang' && (!await read(client, s.market, s.abi, 'isAgent', [session.wallet])
+    if (s.platform === 'gang' && (s.requiresAgent !== false && !await read(client, s.market, s.abi, 'isAgent', [session.wallet])
         || await read(client, s.market, s.abi, 'walletRoom', [s.token, session.wallet]) <= 0n)) {
       throw fail('BUY_NOT_ALLOWED', 'Gang 买入身份或钱包持仓上限不满足');
     }
@@ -153,7 +154,7 @@ export async function runTrade(client, cfg, market, session, journal, baw) {
   const outputToken = intent.side === 'buy' ? s.token : (plan.outputToken || (s.platform === 'four' ? NATIVE : s.quote));
   journal.value('tradeContext', { platform: s.platform, version: s.version, phase: s.phase, market: s.market, token: s.token,
     quote: s.quote, paymentToken: payment(s), outputToken, side: intent.side, amountRaw: typeof quantity === 'bigint' ? quantity.toString() : quantity,
-    estimate: plan.estimate });
+    estimate: plan.estimate, nativeRefundToken: plan.nativeRefundToken });
   await executor.contract('trade', plan.tx);
   return finish(client, cfg, market, executor, intent);
 }
@@ -177,6 +178,13 @@ async function finish(client, cfg, market, executor, intent) {
     await executor.toBnb('sell-to-bnb', context.outputToken, received);
   }
   if (intent.side === 'buy') {
+    // The official native GangRouter buy refunds a cap/graduation cut directly
+    // to the trader as WBNB. Unwrap only this receipt's verified net inflow.
+    if (context.nativeRefundToken) {
+      const refund = erc20Delta(receipt, context.nativeRefundToken, executor.wallet);
+      if (!equal(context.nativeRefundToken, WBNB) || refund < 0n || refund > units(intent.amount)) throw fail('UNVERIFIED_REFUND', '无法核对 Gang 原生买入退款');
+      if (refund > 0n) await executor.toBnb('refund-to-bnb', context.nativeRefundToken, refund);
+    }
     const funding = j.value('fund-buy');
     if (funding) {
       const delta = erc20Delta(receipt, funding.token, executor.wallet);

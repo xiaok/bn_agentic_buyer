@@ -32,6 +32,7 @@
 - token / Market 详情页右下角显示完整地址和“买入 0.001 BNB”。一次点击即执行。Four、Gang 优先读取当前 token URL；Flap 详情读取明确标注的“Market 地址”。
 - Four、Gang 列表的 token 链接旁也显示买入按钮；Flap 列表卡片通过当前页面的 Market 地址 key 绑定各自按钮。悬停条目按钮时，右下角显示对应完整地址。
 - 支持三个平台的链上归属识别，按原确定性交易逻辑处理必要换币、授权、Flap claim 与 BNB 结算。
+- 0.1.3 新增 Gang 2026-10-27 合并 Pad 的 V3 内盘（包括 BOLT）：WBNB 报价时走官方 Router 原生 BNB 买入，通常无需先 wrap 和授权；卖出授权给 Pad，所得 WBNB 自动换回 BNB。持仓上限或毕业产生的 WBNB 退款只按本笔回执解包。非 WBNB 报价仍先兑换；新版 fair mint 打新模式暂不支持，会明确提示。
 - 页面没有可核对的地址、含冲突地址或前端结构变化时停用对应按钮，不会用名字或列表顺序猜币。通常打开该币详情即可；设置页面手动输入仅作为备用入口。
 - 点击后立即显示提交中提示，链上确认后弹出“买入成功”或“卖出成功”及交易链接；失败会显示原因，待确认不会显示成功。
 - 订单页每笔成功买入旁提供“卖出 25% / 50% / 全部”，直接使用该订单的地址，无需再粘贴。比例按当前钱包中该币的持仓计算，而不是单笔买入数量；Flap 内盘按 shares 比例卖出。存在未完成订单时，快捷卖出暂时禁用。
@@ -77,5 +78,6 @@ pnpm test
 - [官方 Binance skill 与 references](https://github.com/binance/binance-skills-hub/tree/main/skills/binance-web3/binance-agentic-wallet)。
 - Four / Flap / Gang 的原始来源、固定 blob 与 ABI 快照见原项目 `RESEARCH.md` 和 `skills/agent-trade/references/operations.md`。
 - 原 agent 的完整文件 SHA256 保存在 `agent-original-sha256.json`，用于验证原版未被修改。
+- Gang 新版固定来源、主网只读验证与测试边界见 [`../research/GANG-MERGED-VALIDATION.md`](../research/GANG-MERGED-VALIDATION.md)。此适配仅更新 Chrome，保留的原 agent 0.1.0 不包含该新版支持。
 
-接口与来源审阅日期：2026-10-25。扩展版本 0.1.2；发布验证日期：2026-10-26。
+基础接口与来源审阅日期：2026-10-25；Gang 新版复核日期：2026-10-28。扩展版本 0.1.3；发布验证日期：2026-10-28。

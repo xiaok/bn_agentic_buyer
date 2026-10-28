@@ -6,7 +6,7 @@
     "token": "0xfC0f0592eDCC6E96efb5Fb5E9CA48db3fb757777",
     "bnb": "0.01",
     "slippageBps": 100,
-    "sender": "0x9aec85a0db856183d425f4d4c7e6f275c17627d9",
+    "sender": "[public reference address omitted]",
     "rpc": "https://bsc-dataseed1.bnbchain.org"
   },
   "method": "Each sample independently resolves registry/probe, checks eligibility and funding, quotes and simulates exact Portal.buy; dependent rounds sequential, independent reads parallel. Includes cast process overhead. State pinned to a fresh block per sample. Single configured Flap adapter, not the full unimplemented three-platform CLI.",

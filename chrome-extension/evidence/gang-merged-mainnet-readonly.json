@@ -1,0 +1,34 @@
+{
+  "checkedAt": "2026-10-28T10:05:46.445Z",
+  "chainId": 56,
+  "block": "130262268",
+  "token": "0x378afee1ce6c88f0fdc568518140b9a0ab794da5",
+  "market": {
+    "platform": "gang",
+    "version": "merged-v3",
+    "input": "0x378afee1ce6c88f0fdc568518140b9a0ab794da5",
+    "token": "0x378afee1ce6c88f0fdc568518140b9a0ab794da5",
+    "market": "0x15CFD2dc8278Fb87a1783ef42111618E20874365"
+  },
+  "phase": "curve",
+  "quote": "0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c",
+  "nativeBuy": true,
+  "requiresAgent": true,
+  "bnbBudget": "0.001",
+  "tx": {
+    "to": "0xE040445690Aa56C8b68B7f7038C7b2562B5079C4",
+    "value": "1000000000000000",
+    "data": "0xa7d2a8f3000000000000000000000000378afee1ce6c88f0fdc568518140b9a0ab794da5000000000000000000000000000000000000000000000cc5830c96177b36a103000000000000000000000000000000000000000000000000000000006ae1ca25"
+  },
+  "approval": null,
+  "estimate": {
+    "amount": "60921060065154352436496",
+    "fee": "10000000000000",
+    "refund": "0"
+  },
+  "ethCallReturn": "0x000000000000000000000000000000000000000000000ce6898b6ba5f0d25510",
+  "broadcast": false,
+  "walletSessionAccessed": false,
+  "personalDataOmitted": true,
+  "validation": "Development-only public RPC reads and eth_call through cast call. No Binance session, signing, broadcast or state-changing transaction. The real trading path still skips local simulation."
+}

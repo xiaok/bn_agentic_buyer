@@ -7,3 +7,8 @@ __pycache__/
 .env.*
 !.env.example
 .agent-trade/
+# Local diagnostics may contain wallet addresses, account details and machine paths.
+agentic-verify-*.mjs
+agentic-diagnose-*.mjs
+*-private.json
+*-raw-readonly.json

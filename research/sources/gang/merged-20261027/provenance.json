@@ -1,0 +1,32 @@
+{
+  "repository": "gangfun/gang-launchpad",
+  "commit": "7d6dfd318d6a15c65563c3d1b0e099ef57bdf123",
+  "reviewedDate": "2026-10-28",
+  "files": [
+    {
+      "path": "docs/MAINNET-GANG-2026-10-27.md",
+      "sha256": "6d8eb3e237b62b854b81ae0370239ee3571a83c340441d19ca1371c48fd3d5ca",
+      "url": "https://raw.githubusercontent.com/gangfun/gang-launchpad/7d6dfd318d6a15c65563c3d1b0e099ef57bdf123/docs/MAINNET-GANG-2026-10-27.md"
+    },
+    {
+      "path": "src/gang/CurveLogic.sol",
+      "sha256": "00207f09459b5ba9313dfee5110e1bdb512e024be72c528e82f6d32d0b807434",
+      "url": "https://raw.githubusercontent.com/gangfun/gang-launchpad/7d6dfd318d6a15c65563c3d1b0e099ef57bdf123/src/gang/CurveLogic.sol"
+    },
+    {
+      "path": "src/gang/interfaces/IGangPadView.sol",
+      "sha256": "bb1181c36370ee6e543e2f1bcc7e9b1ed6cd5577010e3c764bbd9672d153a8ec",
+      "url": "https://raw.githubusercontent.com/gangfun/gang-launchpad/7d6dfd318d6a15c65563c3d1b0e099ef57bdf123/src/gang/interfaces/IGangPadView.sol"
+    },
+    {
+      "path": "src/router/GangRouter.sol",
+      "sha256": "43ee42a6013cce25418bc22339bb33cd57c8810e66ffdd0e4e0b6e1ac32090f6",
+      "url": "https://raw.githubusercontent.com/gangfun/gang-launchpad/7d6dfd318d6a15c65563c3d1b0e099ef57bdf123/src/router/GangRouter.sol"
+    },
+    {
+      "path": "src/stocks/LaunchpadS.sol",
+      "sha256": "7b19a6c558ece5e3cbcc7f14e6d9db49d01d8327a8f03dc723ce77b36deb3b36",
+      "url": "https://raw.githubusercontent.com/gangfun/gang-launchpad/7d6dfd318d6a15c65563c3d1b0e099ef57bdf123/src/stocks/LaunchpadS.sol"
+    }
+  ]
+}

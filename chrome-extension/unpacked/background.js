@@ -26502,6 +26502,44 @@ var init_gang_abi = __esm({
   }
 });
 
+// src/engine/vendor/gang-merged.mjs
+var GANG_MERGED_PAD, GANG_ROUTER, GANG_MERGED_ABI, GANG_ROUTER_ABI, GANG_TOKEN_BINDING, GANG_S_ABI;
+var init_gang_merged = __esm({
+  "src/engine/vendor/gang-merged.mjs"() {
+    init_esm();
+    init_gang_abi();
+    GANG_MERGED_PAD = "0x15CFD2dc8278Fb87a1783ef42111618E20874365";
+    GANG_ROUTER = "0xE040445690Aa56C8b68B7f7038C7b2562B5079C4";
+    GANG_MERGED_ABI = parseAbi([
+      "function kindOf(address token) view returns (uint8)",
+      "function curves(address token) view returns (address creator,address quote,uint128 realQuote,uint128 sold,uint128 gradAmt,uint128 virtualQuote,bool graduated,uint16 buyTaxBps,uint16 sellTaxBps,uint16 dividendBps,address pair,address refPair)",
+      "function buy(address token,uint256 quoteIn,uint256 minTokensOut) returns (uint256)",
+      "function sell(address token,uint256 tokensIn,uint256 minQuoteOut) returns (uint256)",
+      "function isAgent(address account) view returns (bool)",
+      "function walletRoom(address token,address buyer) view returns (uint256)",
+      "function agentGateEnabled() view returns (bool)",
+      "function routers(address router) view returns (bool)",
+      "function wbnb() view returns (address)",
+      "function PROTOCOL_FEE_BPS() view returns (uint256)",
+      "function VIRTUAL_TOKEN() view returns (uint256)",
+      "event Buy(address indexed token,address indexed buyer,uint256 quoteIn,uint256 protocolFee,uint256 tax,uint256 tokensOut,uint256 realQuote)",
+      "event Sell(address indexed token,address indexed seller,uint256 tokensIn,uint256 protocolFee,uint256 tax,uint256 quoteOut,uint256 realQuote)"
+    ]);
+    GANG_ROUTER_ABI = parseAbi([
+      "function pad() view returns (address)",
+      "function wbnb() view returns (address)",
+      "function v3BuyBNB(address token,uint256 minTokensOut,uint256 deadline) payable returns (uint256 tokensOut)"
+    ]);
+    GANG_TOKEN_BINDING = parseAbi(["function launchpad() view returns (address)"]);
+    GANG_S_ABI = V2_ABI.filter((entry) => entry.name !== "curves" && entry.name !== "Created").concat(parseAbi([
+      "function curves(address token) view returns (address creator,address quote,uint128 realQuote,uint128 sold,uint128 gradAmt,uint128 virtualQuote,bool graduated,address pair,address refPair)",
+      "function DIVIDEND_TAX_BPS() view returns (uint256)",
+      "function PLATFORM_TAX_BPS() view returns (uint256)",
+      "event Created(address indexed token,address indexed creator,string name,string symbol,address indexed quote,uint256 gradAmt)"
+    ]));
+  }
+});
+
 // src/engine/vendor/flap-abi.json
 var flap_abi_default;
 var init_flap_abi = __esm({
@@ -27274,6 +27312,7 @@ __export(adapters_exports, {
   buildGang: () => buildGang,
   buildOrdinaryFlap: () => buildOrdinaryFlap,
   detect: () => detect,
+  detectGang: () => detectGang,
   errorData: () => errorData,
   four: () => four,
   gangBuy: () => gangBuy,
@@ -27354,10 +27393,20 @@ async function detectFlap(client, input) {
   return { platform: "flap", version: "agent-curve", input, market, probe: p };
 }
 async function detectGang(client, input) {
-  const results = await Promise.allSettled(GANG_PADS.map(async (pad4) => ({ pad: pad4, curve: await read(client, pad4.address, pad4.abi, "curves", [input]) })));
-  const matches = results.filter((x) => x.status === "fulfilled" && !equal(x.value.curve[0], ZERO)).map((x) => x.value);
+  const results = await Promise.allSettled(GANG_PADS.map(async (pad4) => {
+    const curve = await read(client, pad4.address, pad4.abi, "curves", [input]);
+    const kind = pad4.version === "merged-v3" ? Number(await read(client, pad4.address, pad4.abi, "kindOf", [input])) : null;
+    if (kind !== null && ![0, 1, 2].includes(kind)) throw fail2("UNKNOWN_GANG_KIND", "Gang \u8FD4\u56DE\u672A\u77E5\u53D1\u884C\u79CD\u7C7B");
+    if (kind === 1 && equal(curve[0], ZERO) || kind === 0 && !equal(curve[0], ZERO)) throw fail2("BINDING_MISMATCH", "Gang kindOf \u4E0E\u66F2\u7EBF\u767B\u8BB0\u4E0D\u4E00\u81F4");
+    return { pad: pad4, curve, kind };
+  }));
+  const matches = results.filter((x) => x.status === "fulfilled" && (!equal(x.value.curve[0], ZERO) || x.value.kind === 2)).map((x) => x.value);
   if (matches.length > 1) throw fail2("AMBIGUOUS_PLATFORM", "Gang \u591A\u4E2A\u5206\u652F\u540C\u65F6\u767B\u8BB0\u6B64\u5730\u5740");
-  if (matches.length) return { platform: "gang", version: matches[0].pad.version, input, token: input, market: matches[0].pad.address };
+  if (matches.length) {
+    const { pad: pad4, kind } = matches[0];
+    if (kind !== null && !equal(await read(client, input, GANG_TOKEN_BINDING, "launchpad"), pad4.address)) throw fail2("BINDING_MISMATCH", "Gang \u4EE3\u5E01\u53D1\u884C\u5408\u7EA6\u7ED1\u5B9A\u4E0D\u4E00\u81F4");
+    return { platform: "gang", version: kind === 2 ? "merged-fair" : pad4.version, input, token: input, market: pad4.address };
+  }
   if (results.some((x) => x.status === "rejected")) throw fail2("RPC_INCOMPLETE", "\u65E0\u6CD5\u5B8C\u6574\u8BFB\u53D6 Gang \u767B\u8BB0\uFF0C\u4E0D\u80FD\u5F53\u4F5C\u4E0D\u5B58\u5728");
   return null;
 }
@@ -27388,18 +27437,34 @@ async function state(client, cfg, market) {
     };
   }
   if (market.platform === "gang") {
+    if (market.version === "merged-fair") throw fail2("UNSUPPORTED_GANG_KIND", "\u6B64\u5E01\u662F Gang \u6253\u65B0\uFF0C\u4E0D\u662F V3 \u66F2\u7EBF\uFF1B\u5F53\u524D\u7248\u672C\u4E0D\u652F\u6301\u6253\u65B0\u4EFD\u989D\u4EA4\u6613");
     const pad4 = GANG_PADS.find((x) => x.version === market.version);
     const c = await read(client, pad4.address, pad4.abi, "curves", [market.token]);
     if (equal(c[0], ZERO)) throw fail2("UNSUPPORTED_TOKEN", "Gang \u767B\u8BB0\u4E0D\u5B58\u5728");
     const soft = ["soft", "v4.1"].includes(pad4.version);
-    return {
-      ...market,
-      phase: c[soft ? 3 : 6] ? "dex" : "curve",
-      quote: soft ? NATIVE : c[1],
-      soft,
-      abi: pad4.abi,
-      curve: c
-    };
+    const result2 = { ...market, phase: c[soft ? 3 : 6] ? "dex" : "curve", quote: soft ? NATIVE : c[1], soft, abi: pad4.abi, curve: c };
+    if (pad4.version === "s") {
+      const fees = await Promise.all(["DIVIDEND_TAX_BPS", "PLATFORM_TAX_BPS"].map((name) => read(client, pad4.address, pad4.abi, name)));
+      if (fees.some((fee) => fee !== 50n)) throw fail2("UNSUPPORTED_FEE", "Gang S \u624B\u7EED\u8D39\u5E38\u6570\u53D8\u5316\uFF0C\u8BF7\u66F4\u65B0\u9002\u914D");
+      result2.feeParts = fees;
+    }
+    if (pad4.version === "merged-v3") {
+      const [kind, routerPad, routerWbnb, padWbnb, listed, gate, fee, virtual] = await Promise.all([
+        read(client, pad4.address, pad4.abi, "kindOf", [market.token]),
+        read(client, GANG_ROUTER, GANG_ROUTER_ABI, "pad"),
+        read(client, GANG_ROUTER, GANG_ROUTER_ABI, "wbnb"),
+        read(client, pad4.address, pad4.abi, "wbnb"),
+        read(client, pad4.address, pad4.abi, "routers", [GANG_ROUTER]),
+        read(client, pad4.address, pad4.abi, "agentGateEnabled"),
+        read(client, pad4.address, pad4.abi, "PROTOCOL_FEE_BPS"),
+        read(client, pad4.address, pad4.abi, "VIRTUAL_TOKEN")
+      ]);
+      if (Number(kind) !== 1 || !equal(routerPad, pad4.address) || !equal(routerWbnb, WBNB) || !equal(padWbnb, WBNB)) throw fail2("BINDING_MISMATCH", "Gang Pad / Router / WBNB \u7ED1\u5B9A\u4E0D\u4E00\u81F4");
+      if (fee !== 100n || virtual !== VT) throw fail2("UNSUPPORTED_CURVE", "Gang \u66F2\u7EBF\u5E38\u6570\u53D8\u5316\uFF0C\u8BF7\u66F4\u65B0\u9002\u914D");
+      result2.requiresAgent = gate;
+      result2.nativeBuy = equal(c[1], WBNB) && listed && gate;
+    }
+    return result2;
   }
   const fields = await probe(client, market.probe, ZERO, "assetProbe", [], ["MARKET", "QUOTE", "DECIMALS"]);
   if (!equal(fields.MARKET, market.market)) throw fail2("BINDING_MISMATCH", "Flap assetProbe \u8FD4\u56DE\u4E0D\u540C Market");
@@ -27416,14 +27481,17 @@ async function state(client, cfg, market) {
   }
   return result;
 }
-function gangBuy(curve, gross, room) {
+function gangBuy(curve, gross, room, feeParts = [100n]) {
   const [, , raised, sold, grad, virtual] = curve.map((x, i) => [2, 3, 4, 5].includes(i) ? BigInt(x) : x);
   const k = virtual * VT, q = virtual + raised, t = VT - sold;
   if (grad <= raised || room <= 0n) throw fail2("CURVE_CLOSED_OR_CAP", "\u66F2\u7EBF\u5DF2\u6EE1\u6216\u8FBE\u5230\u94B1\u5305\u6301\u4ED3\u4E0A\u9650");
-  let net = gross - gross / 100n, fee = gross / 100n, refund = 0n;
+  const feeFor = (amount) => feeParts.reduce((sum, rate) => sum + amount * rate / 10000n, 0n);
+  const feeBps = feeParts.reduce((sum, rate) => sum + rate, 0n);
+  let net = gross - feeFor(gross), fee = feeFor(gross), refund = 0n;
   function recompute(target) {
-    const spent = ceil(target * 10000n, 9900n) < gross ? ceil(target * 10000n, 9900n) : gross;
-    fee = spent / 100n;
+    const needed = ceil(target * 10000n, 10000n - feeBps);
+    const spent = needed < gross ? needed : gross;
+    fee = feeFor(spent);
     net = spent - fee;
     refund = gross - spent;
   }
@@ -27440,11 +27508,11 @@ function gangBuy(curve, gross, room) {
   if (tokens <= 0n) throw fail2("ZERO_OUTPUT", "\u4E70\u5165\u62A5\u4EF7\u4E3A\u96F6");
   return { amount: tokens, fee, refund };
 }
-function gangSell(curve, amount) {
+function gangSell(curve, amount, feeParts = [100n]) {
   const raised = BigInt(curve[2]), sold = BigInt(curve[3]), virtual = BigInt(curve[5]);
   if (amount > sold) throw fail2("INVALID_CURVE_AMOUNT", "\u5356\u51FA\u6570\u91CF\u8D85\u8FC7\u66F2\u7EBF\u552E\u51FA\u6570\u91CF");
   const gross = virtual + raised - ceil(virtual * VT, VT - sold + amount);
-  return gross - gross / 100n;
+  return gross - feeParts.reduce((sum, rate) => sum + gross * rate / 10000n, 0n);
 }
 async function buildFlap(client, s, wallet, side, quantity, slip) {
   const blockNumber = await client.getBlockNumber({ cacheTime: 0 });
@@ -27483,24 +27551,33 @@ async function buildFlap(client, s, wallet, side, quantity, slip) {
 }
 async function buildGang(client, s, wallet, side, quantity, slip) {
   if (side === "buy") {
-    if (!await read(client, s.market, s.abi, "isAgent", [wallet])) throw fail2("NO_AGENT_ID", "Gang \u4E70\u5165\u9700\u8981 Agent ID");
+    if (s.requiresAgent !== false && !await read(client, s.market, s.abi, "isAgent", [wallet])) throw fail2("NO_AGENT_ID", "Gang \u4E70\u5165\u9700\u8981 Agent ID");
     let expected2;
     if (s.soft) {
       const q = await read(client, s.market, s.abi, "quoteBuy", [s.token, wallet, quantity]);
       expected2 = { amount: q[0], fee: q[2], refund: q[3] };
     } else {
       const room = await read(client, s.market, s.abi, "walletRoom", [s.token, wallet]);
-      expected2 = gangBuy(s.curve, quantity, room);
+      expected2 = gangBuy(s.curve, quantity, room, s.feeParts);
     }
     if (expected2.amount <= 0n) throw fail2("ZERO_OUTPUT", "Gang \u62A5\u4EF7\u4E3A\u96F6");
+    if (s.version === "merged-v3" && s.nativeBuy) {
+      const deadline = (await client.getBlock()).timestamp + 300n;
+      return {
+        tx: tx(GANG_ROUTER, GANG_ROUTER_ABI, "v3BuyBNB", [s.token, down(expected2.amount, slip), deadline], quantity),
+        approval: null,
+        estimate: expected2,
+        nativeRefundToken: WBNB
+      };
+    }
     return {
       tx: tx(s.market, s.abi, "buy", s.soft ? [s.token, down(expected2.amount, slip)] : [s.token, quantity, down(expected2.amount, slip)], s.soft ? quantity : 0n),
       approval: s.soft ? null : { token: s.quote, spender: s.market, amount: quantity },
       estimate: expected2
     };
   }
-  if (!s.soft && !await read(client, s.market, s.abi, "isAgent", [wallet])) throw fail2("NO_AGENT_ID", "\u5F53\u524D Gang \u7248\u672C\u5356\u51FA\u9700\u8981 Agent ID");
-  const expected = s.soft ? (await read(client, s.market, s.abi, "quoteSell", [s.token, quantity]))[0] : gangSell(s.curve, quantity);
+  if (!s.soft && s.requiresAgent !== false && !await read(client, s.market, s.abi, "isAgent", [wallet])) throw fail2("NO_AGENT_ID", "\u5F53\u524D Gang \u7248\u672C\u5356\u51FA\u9700\u8981 Agent ID");
+  const expected = s.soft ? (await read(client, s.market, s.abi, "quoteSell", [s.token, quantity]))[0] : gangSell(s.curve, quantity, s.feeParts);
   if (expected <= 0n) throw fail2("ZERO_OUTPUT", "Gang \u5356\u51FA\u62A5\u4EF7\u4E3A\u96F6");
   return {
     tx: tx(s.market, s.abi, "sell", [s.token, quantity, down(expected, slip)]),
@@ -27528,6 +27605,7 @@ var init_adapters = __esm({
     init_esm();
     init_core();
     init_gang_abi();
+    init_gang_merged();
     init_flap_abi();
     init_four_browser();
     ERC20 = ERC20_ABI;
@@ -27551,8 +27629,9 @@ var init_adapters = __esm({
       { version: "v2", address: "0x1B8F3f69DFa0a7F63d308C7EB0Fd38D8b099966E", abi: V2_ABI },
       { version: "soft", address: "0x4E6f13c8A453c1b8b4E20b590082bb233a5b80d7", abi: SOFT_ABI },
       { version: "u", address: "0xF81C4E51c48466c6025B0165b1Ea0F6978c712cb", abi: V2_ABI },
-      { version: "s", address: "0x60aee38576035E757deD30fF8db8A8DA476430C1", abi: V2_ABI },
-      { version: "v4.1", address: "0x315Ba2e8952D06094CC636b2B84229FA32fb23A7", abi: SOFT_ABI }
+      { version: "s", address: "0x60aee38576035E757deD30fF8db8A8DA476430C1", abi: GANG_S_ABI },
+      { version: "v4.1", address: "0x315Ba2e8952D06094CC636b2B84229FA32fb23A7", abi: SOFT_ABI },
+      { version: "merged-v3", address: GANG_MERGED_PAD, abi: GANG_MERGED_ABI }
     ];
     read = (client, target, abi2, functionName, args = [], extra = {}) => client.readContract({ address: target, abi: abi2, functionName, args, ...extra });
     balance = (client, token, wallet) => equal(token, NATIVE) || equal(token, ZERO) ? client.getBalance({ address: wallet }) : read(client, token, ERC20, "balanceOf", [wallet]);
@@ -27824,6 +27903,7 @@ function open(s) {
 function payment(s) {
   if (s.phase === "dex") return NATIVE;
   if (s.platform === "four") return NATIVE;
+  if (s.platform === "gang" && s.version === "merged-v3" && s.nativeBuy) return NATIVE;
   if (s.platform === "flap" && s.phase === "flap-curve") {
     return s.flapState.nativeToQuoteSwapEnabled || equal(s.flapState.quoteTokenAddress, ZERO) ? NATIVE : s.flapState.quoteTokenAddress;
   }
@@ -27919,7 +27999,7 @@ async function runTrade(client, cfg, market, session, journal, baw) {
   }
   let quantity;
   if (intent.side === "buy") {
-    if (s.platform === "gang" && (!await read(client, s.market, s.abi, "isAgent", [session.wallet]) || await read(client, s.market, s.abi, "walletRoom", [s.token, session.wallet]) <= 0n)) {
+    if (s.platform === "gang" && (s.requiresAgent !== false && !await read(client, s.market, s.abi, "isAgent", [session.wallet]) || await read(client, s.market, s.abi, "walletRoom", [s.token, session.wallet]) <= 0n)) {
       throw fail2("BUY_NOT_ALLOWED", "Gang \u4E70\u5165\u8EAB\u4EFD\u6216\u94B1\u5305\u6301\u4ED3\u4E0A\u9650\u4E0D\u6EE1\u8DB3");
     }
     if (s.platform === "flap" && s.phase === "curve") {
@@ -27967,7 +28047,8 @@ async function runTrade(client, cfg, market, session, journal, baw) {
     outputToken,
     side: intent.side,
     amountRaw: typeof quantity === "bigint" ? quantity.toString() : quantity,
-    estimate: plan.estimate
+    estimate: plan.estimate,
+    nativeRefundToken: plan.nativeRefundToken
   });
   await executor.contract("trade", plan.tx);
   return finish(client, cfg, market, executor, intent);
@@ -27992,6 +28073,11 @@ async function finish(client, cfg, market, executor, intent) {
     await executor.toBnb("sell-to-bnb", context.outputToken, received);
   }
   if (intent.side === "buy") {
+    if (context.nativeRefundToken) {
+      const refund = erc20Delta(receipt, context.nativeRefundToken, executor.wallet);
+      if (!equal(context.nativeRefundToken, WBNB) || refund < 0n || refund > units(intent.amount)) throw fail2("UNVERIFIED_REFUND", "\u65E0\u6CD5\u6838\u5BF9 Gang \u539F\u751F\u4E70\u5165\u9000\u6B3E");
+      if (refund > 0n) await executor.toBnb("refund-to-bnb", context.nativeRefundToken, refund);
+    }
     const funding = j.value("fund-buy");
     if (funding) {
       const delta = erc20Delta(receipt, funding.token, executor.wallet);

@@ -8,6 +8,8 @@
 
 在 Four / Flap / Gang 的 token 条目及详情页显示买入按钮，点击直接执行，无需经过聊天模型。扩展内提供首次扫码连接、默认参数、订单与恢复记录；订单旁可以卖出当前持仓的 25%、50% 或全部。提交和链上确认分别显示状态，成功后提供交易链接。悬浮面板和订单页都有平台快捷入口。
 
+Chrome 0.1.3 已适配 Gang 2026-10-27 新版 V3 内盘（含 BOLT），修正旧 S 分支 ABI。新版原生 BNB 买入通常无需预先 wrap / 授权，卖出与退款按本笔回执结算为 BNB；fair mint 打新暂不支持。已通过 58 项测试及 BOLT 主网只读调用，尚未新增实盘验证。原 agent 版本保持不变；详情见 [新版验证记录](research/GANG-MERGED-VALIDATION.md)。
+
 1. 下载并解压本仓库，或 clone 到本机。
 2. 打开 `chrome://extensions`，开启开发者模式，点击“加载已解压的扩展程序”。
 3. 选择仓库中的 [`chrome-extension/unpacked/`](chrome-extension/unpacked/) 目录，其中已包含 `manifest.json` 和完整构建文件，无需安装依赖或编译。
